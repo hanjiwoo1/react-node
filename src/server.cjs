@@ -17,12 +17,10 @@ app.get('/', (req, res) => {
 
 app.get('/api', async (req, res) => {
   try {
-    // 쿼리 파라미터를 가져오는 방식이 잘못되었습니다. GET 요청의 쿼리 파라미터는 req.query에서 가져와야 합니다.
+    // get : req.query, post : req.body
     const { query = {} } = req.query;
-
     const result = await executeQuery(`SELECT * FROM USER`);
-
-    return res.json({ ok: true, data: result });
+    return res.json({ ok: true, result });
   } catch (error) {
     return res.json({ ok: false, error });
   }
