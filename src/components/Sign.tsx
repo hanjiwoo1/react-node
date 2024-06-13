@@ -1,11 +1,14 @@
 import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 
 export function Sign() {
 
-  const registerUrl = "http://localhost:8080/register"; // 가입 URL에 대한 예시 URL
+  const registerUrl = "http://localhost:8080/sign";
+
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleRegister = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -30,8 +33,10 @@ export function Sign() {
     );
     const result = await response.json();
     console.log('result : ', result);
+    if (result.isSuccess) {
+      navigate('/'); // 이동할 경로 설정
+    }
 
-    // 회원가입 성공 후 추가적인 작업 수행 (예: 페이지 이동, 사용자 알림 등)
   }
 
   return (

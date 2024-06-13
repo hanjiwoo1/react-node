@@ -1,20 +1,19 @@
 import './App.css'
-import {ColumnDef} from "@tanstack/react-table";
 import LoginForm from "./components/LoginForm.tsx";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Sign from "./components/Sign.tsx";
 
-interface User{
-  name: string;
-  userId: string;
-}
+// interface User{
+//   name: string;
+//   userId: string;
+// }
 
 function App() {
 
-  const column: ColumnDef<User>[] = [
-    {id: 'name', header: '이름', accessorFn: (row: User) => row.name},
-    {id: 'userId', header: 'id', accessorFn: (row: User) => row.userId},
-  ];
+  // const column: ColumnDef<User>[] = [
+  //   {id: 'name', header: '이름', accessorFn: (row: User) => row.name},
+  //   {id: 'userId', header: 'id', accessorFn: (row: User) => row.userId},
+  // ];
 
   return (
     <BrowserRouter>

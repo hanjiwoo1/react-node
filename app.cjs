@@ -25,7 +25,6 @@ app.use(session({
   saveUninitialized: false
 }))
 
-
 const userRouter = require('./routes/user.cjs');
 // const indexRouter = require('./routes');
 
@@ -71,6 +70,31 @@ app.post('/login', async (req, res) => {
 
     });
   }
+});
+
+app.post('/sign', async (req, res) => {
+  const userId = req.body.userId;
+  const password = req.body.password;
+  const sendData = {isSuccess: ""};
+
+  if (userId && password) {
+    conn.query(`SELECT * FROM USER WHERE userId = ?`, [userId], function (err, results, fields) {
+      if (results.length <= 0) {
+        const hasedPw = bcrypt.hashSync(password, 10);
+        conn.query(`INSERT INTO USER (userId, password)
+                    VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
+          req.session.save(function () {
+            sendData.isSuccess = 'true';
+            res.send(sendData);
+          });
+        });
+      } else {
+        sendData.isSuccess = '이미 존재하는 아이디 입니다.'
+        res.send(sendData);
+      }
+    });
+  }
+
 });
 
 // 정적 파일 제공
