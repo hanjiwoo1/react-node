@@ -1,20 +1,43 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
 
-  const loginUrl = "http://localhost:8080/login";
+  const baseUrl = "http://localhost:8080";
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  /**
+   * credentials: 'include' 옵션을 주지 않으면 백엔드에서 세션 값을 정상적으로 받아올 수 없습니다.
+   * 로그인 요청에서는 반드시 이 옵션을 사용하여 세션 쿠키를 포함해야 합니다.
+   */
+
+  useEffect(() => {
+    fetch(baseUrl + `/authCheck`, {
+      credentials: 'include' // 세션 쿠키 포함
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.isLogin == true) {
+          // setMode("WELCOME");
+          console.log('세션있음 : ');
+        } else {
+          // setMode("LOGIN");
+          console.log('로그인 필요 : ');
+          navigate("/", { replace: true });
+        }
+      });
+  }, []);
 
   const handleLogin = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
     const response = await fetch(
-      loginUrl,
+      baseUrl +`/login`,
       {
         method: "POST",
+        credentials: 'include', // 세션 쿠키 포함
         headers: {
           "Content-Type": "application/json",
         },
@@ -25,11 +48,12 @@ export function LoginForm() {
       }
     );
     const result = await response.json();
-    console.log('result : ', result);
+    // console.log('result : ', result);
 
     // 로그인 성공 시 다음 페이지로 이동
     if (result.ok) {
-      navigate('/dashboard'); // 이동할 경로 설정
+      // navigate('/dashboard'); // 이동할 경로 설정
+      console.log('로그인성공 : ', )
     }
   }
 

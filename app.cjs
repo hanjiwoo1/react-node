@@ -13,7 +13,10 @@ const conn = require('./routes/requestDB/db.cjs'),
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json()); // 없으면 req.body undefined
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 const sessionStore = new MySQLStore(sessionOption);
 
@@ -22,7 +25,12 @@ app.use(session({
   secret: '~',
   store: sessionStore,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // 쿠키 유효기간 설정 (예: 1일)
+    secure: false,
+    httpOnly: true // 클라이언트에서 자바스크립트를 통해 쿠키에 접근하지 못하도록 설정
+  }
 }))
 
 const userRouter = require('./routes/user.cjs');
@@ -30,13 +38,25 @@ const userRouter = require('./routes/user.cjs');
 
 app.use('/user', userRouter);
 
+app.get('/authCheck', (req, res) => {
+
+  const sendData = {isLogin: ''};
+  console.log('authcheck', req.session.isLogin)
+  if (req.session.isLogin) {
+    sendData.isLogin = true;
+  } else {
+    sendData.isLogin = false;
+  }
+  res.send(sendData);
+});
+
 app.post('/login', async (req, res) => {
   const {
     userId,
     password
   } = req.body;
 
-  const sendData = {isLogin: ""}
+  const sendData = {isLogin: ''}
 
   if (userId == '' || password == '') {
     res.status(401).json({ok: false, error: "ID와 PW를 모두 입력해주세요."});
@@ -45,28 +65,33 @@ app.post('/login', async (req, res) => {
     conn.query(loadUser, [userId], function (error, results, fields) {
 
       if (results.length > 0) {
-        console.log('results : ', results[0].password)
         bcrypt.compare(password, results[0].password, (error, result) => {
           if (error) {
             console.error('bcrypt 비교 오류:', error);
             res.status(500).json({ ok: false, error: "서버 오류 발생" });
             return;
           }
-          console.log('비밀번호대조 결과 : ', result)
+          // console.log('비밀번호대조 결과 : ', result)
 
           if (result) {
             console.log('로그인성공 : ', )
             req.session.isLogin = true;
             req.session.userId = userId;
-            req.session.save(function () {
-              sendData.isLogin = 'true';
+            console.log('req.session : ', req.session)
+            req.session.save(function (err) {
+              if (err) {
+                console.error('세션 저장 오류:', err);
+                res.status(500).json({ ok: false, error: "세션 저장 오류 발생" });
+                return;
+              }
+              sendData.isLogin = true;
               res.send(sendData);
             });
           }
         });
       }
 
-      res.json({ok:true, data: sendData})
+      // res.json({ok:true, data: sendData})
 
     });
   }
@@ -75,7 +100,7 @@ app.post('/login', async (req, res) => {
 app.post('/sign', async (req, res) => {
   const userId = req.body.userId;
   const password = req.body.password;
-  const sendData = {isSuccess: ""};
+  const sendData = {isSuccess: ''};
 
   if (userId && password) {
     conn.query(`SELECT * FROM USER WHERE userId = ?`, [userId], function (err, results, fields) {
@@ -84,7 +109,7 @@ app.post('/sign', async (req, res) => {
         conn.query(`INSERT INTO USER (userId, password)
                     VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
           req.session.save(function () {
-            sendData.isSuccess = 'true';
+            sendData.isSuccess = true;
             res.send(sendData);
           });
         });
