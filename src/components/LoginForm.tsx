@@ -21,10 +21,10 @@ export function LoginForm() {
         if (json.isLogin == true) {
           // setMode("WELCOME");
           console.log('세션있음 : ');
+          navigate("/dashBoard", { replace: true });
         } else {
           // setMode("LOGIN");
           console.log('로그인 필요 : ');
-          navigate("/", { replace: true });
         }
       });
   }, []);
@@ -47,12 +47,13 @@ export function LoginForm() {
       }
     );
     const result = await response.json();
-    // console.log('result : ', result);
+    console.log('result : ', result);
 
     // 로그인 성공 시 다음 페이지로 이동
     if (result.ok) {
       // navigate('/dashboard'); // 이동할 경로 설정
       console.log('로그인성공 : ', )
+      navigate("/dashBoard", { replace: true });
     }
   }
 

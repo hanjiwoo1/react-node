@@ -34,9 +34,11 @@ app.use(session({
 }))
 
 const userRouter = require('./routes/user.cjs');
+const fileRouter = require('./routes/file/file.cjs')
 // const indexRouter = require('./routes');
 
 app.use('/user', userRouter);
+app.use('/file', fileRouter);
 
 app.get('/authCheck', (req, res) => {
 
