@@ -12,7 +12,6 @@ export function LoginForm() {
    * credentials: 'include' 옵션을 주지 않으면 백엔드에서 세션 값을 정상적으로 받아올 수 없습니다.
    * 로그인 요청에서는 반드시 이 옵션을 사용하여 세션 쿠키를 포함해야 합니다.
    */
-
   useEffect(() => {
     fetch(baseUrl + `/authCheck`, {
       credentials: 'include' // 세션 쿠키 포함
