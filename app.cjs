@@ -33,17 +33,17 @@ app.use(session({
   }
 }))
 
-const userRouter = require('./routes/user.cjs');
+const postsRouter = require('./routes/posts.cjs');
 const fileRouter = require('./routes/file/file.cjs')
 // const indexRouter = require('./routes');
 
-app.use('/user', userRouter);
+app.use('/posts', postsRouter);
 app.use('/file', fileRouter);
 
 app.get('/authCheck', (req, res) => {
 
   const sendData = {isLogin: ''};
-  console.log('authcheck', req.session.isLogin)
+  // console.log('authcheck', req.session.isLogin)
   if (req.session.isLogin) {
     sendData.isLogin = true;
   } else {

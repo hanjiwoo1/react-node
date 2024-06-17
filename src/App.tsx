@@ -2,7 +2,7 @@ import './App.css'
 import LoginForm from "./components/LoginForm.tsx";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Sign from "./components/Sign.tsx";
-import DashBoard from "./pages/dashBoard/dashBoard.tsx";
+import DashBoard from "./pages/dashBoard/DashBoard.tsx";
 
 // interface User{
 //   name: string;
