@@ -14,4 +14,14 @@ router.post('/', async(req, res) => {
   }
 })
 
+router.get('/detail/:id', async(req, res) => {
+  try{
+    const { id } = req.params;
+    const queryData = await executeQuery(`SELECT * FROM posts WHERE id = ${id}`);
+    return res.json({ ok: true, data: queryData });
+  }catch(error){
+    console.log(error)
+  }
+})
+
 module.exports = router

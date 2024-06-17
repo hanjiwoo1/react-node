@@ -4,14 +4,14 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { columns, posts } from "../../table/dashBoard/column.tsx";
 import { DataTable } from "../../table/dashBoard/DataTable.tsx";
 
-interface ResponseData {
+export interface ResponseData {
   ok: boolean;
   totalCount: number;
   data: posts[];
 }
 
 function DashBoard() {
-  const baseUrl = "http://localhost:8080";
+  const baseUrl = import.meta.env.VITE_API_URL
   const [{ pageIndex, pageSize }, setPagination] = useState({
     pageIndex: 0,
     pageSize: 20,
@@ -40,6 +40,8 @@ function DashBoard() {
       !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
     state: { pagination },
   });
+
+  console.log('table : ', table)
 
   useEffect(() => {
     setLoading(true);
