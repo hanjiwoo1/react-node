@@ -4,6 +4,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Sign from "./components/Sign.tsx";
 import DashBoard from "./pages/dashBoard/DashBoard.tsx";
 import DashBoardDetail from "./pages/dashBoard/DashBoardDetail.tsx";
+import DashBoardReg from "./pages/dashBoard/DashBoardReg.tsx";
 
 // interface User{
 //   name: string;
@@ -24,6 +25,7 @@ function App() {
         <Route path="/sign" element={<Sign />} />
         <Route path="/dashBoard" element={<DashBoard />} />
         <Route path="/dashBoard/detail/:id" element={<DashBoardDetail />} />
+        <Route path="/dashBoard/reg" element={<DashBoardReg />} />
       </Routes>
       {/* Uncomment your Table component once the routing issue is resolved */}
       {/* <Table */}

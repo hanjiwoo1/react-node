@@ -20,11 +20,11 @@ export function LoginForm() {
       .then((json) => {
         if (json.isLogin == true) {
           // setMode("WELCOME");
-          console.log('세션있음 : ');
+          // console.log('세션있음 : ');
           navigate("/dashBoard", { replace: true });
         } else {
           // setMode("LOGIN");
-          console.log('로그인 필요 : ');
+          // console.log('로그인 필요 : ');
         }
       });
   }, []);

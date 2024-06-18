@@ -24,4 +24,26 @@ router.get('/detail/:id', async(req, res) => {
   }
 })
 
+router.post('/insert', async(req, res) => {
+  try{
+    const title = req.body.title
+    const content = req.body.content
+    const insertId = req.body.insertId
+    const values = [title, content, insertId];
+    const insertSql = `INSERT INTO posts (title, content, fileId) VALUES (?,?,?)`
+
+    conn.query(insertSql, values, async (err, result) => {
+      if (err) {
+        console.error('게시판 글 등록 에러' + err.stack);
+      }
+      console.log('게시판 등록 성공',);
+      const select = await executeQuery(`SELECT * FROM posts WHERE id = ${result.insertId}`)
+      return res.json({ok: true, result : select});
+    })
+    // return res.json({ ok: true, data: queryData });
+  }catch(error){
+    console.log(error)
+  }
+})
+
 module.exports = router
