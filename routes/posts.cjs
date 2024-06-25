@@ -17,8 +17,9 @@ router.post('/', async(req, res) => {
 router.get('/detail/:id', async(req, res) => {
   try{
     const { id } = req.params;
-    const queryData = await executeQuery(`SELECT * FROM posts WHERE id = ${id}`);
-    return res.json({ ok: true, data: queryData });
+    const posts = await executeQuery(`SELECT * FROM posts WHERE id = ${id}`);
+    const files = await executeQuery(`SELECT * FROM files WHERE postId = ${id}`);
+    return res.json({ ok: true, data: {posts, files} });
   }catch(error){
     console.log(error)
   }
