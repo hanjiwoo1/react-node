@@ -1,4 +1,3 @@
-import {uploadFile} from "../../lib/fileApi.ts";
 import {useEffect, useMemo, useState} from "react";
 import {getCoreRowModel, useReactTable} from "@tanstack/react-table";
 import {columns, posts} from "../../table/dashBoard/column.tsx";
@@ -38,8 +37,7 @@ function DashBoard() {
     manualPagination: true,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    pageCount:
-      !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
+    pageCount: !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
     state: { pagination },
   });
 

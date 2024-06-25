@@ -47,10 +47,9 @@ export function LoginForm() {
       }
     );
     const result = await response.json();
-    console.log('result : ', result);
 
     // 로그인 성공 시 다음 페이지로 이동
-    if (result.ok) {
+    if (result.isLogin) {
       // navigate('/dashboard'); // 이동할 경로 설정
       console.log('로그인성공 : ', )
       navigate("/dashBoard", { replace: true });

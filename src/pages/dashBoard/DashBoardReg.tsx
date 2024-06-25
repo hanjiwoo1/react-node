@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {uploadFile} from "../../lib/fileApi.ts";
 import {fetchApi} from "../../lib/fetchApi.ts";
+import {useNavigate} from "react-router-dom";
 
 interface apiResponse {
   ok: boolean;
@@ -17,30 +18,40 @@ function DashBoardReg() {
   const baseUrl = import.meta.env.VITE_API_URL;
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData();
     const fileInput = e.currentTarget.file as HTMLInputElement;
+
     if (fileInput.files && fileInput.files[0]) {
       formData.append("file", fileInput.files[0]);
-      const result = await uploadFile(formData);
-      const data = {
-        title : title,
-        content : content,
-        insertId : result.insertId, // file 테이블에서 리턴된 아이디
-      }
-      await insert(data);
     }
-  };
-  
-  const insert = async (data: { title: string; content: string; insertId: number; }) =>{
-    const result = await fetchApi<apiResponse>(`${baseUrl}/posts/insert`, data);
-    updateFileTable(result);
-  }
 
-  const updateFileTable = async (result:apiResponse) => {
+    const result = await uploadFile(formData); // 파일 업로드
+
+    const data = {
+      title: title,
+      content: content,
+      insertId: fileInput.files && fileInput.files[0] ? result.insertId : null, // 파일이 있을 때만 insertId 사용
+    };
+
+    await insert(data); // 데이터 인서트
+  };
+
+  const insert = async (data: { title: string; content: string; insertId: number | null }) => {
+    
+    const result = await fetchApi<apiResponse>(`${baseUrl}/posts/insert`, data);
+    if (data.insertId !== null) {
+      updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
+    }
+
+    navigate("/dashBoard", { replace: true });
+  };
+
+  const updateFileTable = async (result: apiResponse) => {
     await fetchApi(`${baseUrl}/file/update`, result);
   };
 

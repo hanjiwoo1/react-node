@@ -42,7 +42,6 @@ function DashBoardDetail() {
             className="font-bold text-xl mb-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
             value={resp?.title}
             onChange={handleChange}
-            readOnly={!resp} // resp가 없을 때만 readOnly로 설정
           />
           <textarea
             name="content"
@@ -50,7 +49,6 @@ function DashBoardDetail() {
             rows={6}
             value={resp?.content}
             onChange={handleChange}
-            readOnly={!resp} // resp가 없을 때만 readOnly로 설정
           />
         </div>
         <div className="px-6 py-4">

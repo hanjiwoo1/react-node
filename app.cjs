@@ -79,7 +79,7 @@ app.post('/login', async (req, res) => {
             console.log('로그인성공 : ', )
             req.session.isLogin = true;
             req.session.userId = userId;
-            console.log('req.session : ', req.session)
+            // console.log('req.session : ', req.session)
             req.session.save(function (err) {
               if (err) {
                 console.error('세션 저장 오류:', err);

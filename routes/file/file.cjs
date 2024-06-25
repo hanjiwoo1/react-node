@@ -45,7 +45,7 @@ router.post('/update', async(req, res) => {
         console.error('파일정보등록 에러' + err.stack);
         return
       }
-      console.log('파일등록정보 업데이트',);
+      // console.log('파일등록정보 업데이트',);
       return res.json({ ok: true, result });
     })
     // return res.json({ ok: true, data: queryData });
