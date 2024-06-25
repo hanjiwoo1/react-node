@@ -1,19 +1,17 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { posts } from "../../table/dashBoard/column.tsx";
+import {uploadFile} from "../../lib/fileApi.ts";
+import {fetchApi} from "../../lib/fetchApi.ts";
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 function DashBoardDetail() {
   const { id } = useParams();
-  const baseUrl = import.meta.env.VITE_API_URL;
-  const [resp, setData] = useState<posts | null>(null);
-
-  const handleSubmit = () =>{
-
-  }
-
-  const handleChange = () =>{
-
-  }
+  const [title, setTitle] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [file, setFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
 
     useEffect(() => {
       fetch(`${baseUrl}/posts/detail/${id}`, {
@@ -25,13 +23,17 @@ function DashBoardDetail() {
       })
         .then((res) => res.json())
         .then((res) => {
-          setData(res.data[0]);
+          setTitle(res.data.posts[0].title)
+          setContent(res.data.posts[0].content)
         })
         .catch((err) => {
           console.error(err);
         });
     }, []);
 
+   const handleSubmit = () =>{
+
+    }
   return (
     <form onSubmit={handleSubmit}>
       <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden m-4">
@@ -40,15 +42,25 @@ function DashBoardDetail() {
             type="text"
             name="title"
             className="font-bold text-xl mb-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
-            value={resp?.title}
-            onChange={handleChange}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
           />
           <textarea
             name="content"
             className="text-gray-700 text-base bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
             rows={6}
-            value={resp?.content}
-            onChange={handleChange}
+            value={content}
+            onChange={e => setContent(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            파일 선택
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            type="file"
+            name="file"
           />
         </div>
         <div className="px-6 py-4">
