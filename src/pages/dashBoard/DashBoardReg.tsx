@@ -16,7 +16,7 @@ interface apiResponse {
   };
   error?: string;
 }
-
+// TODO 파일업로드기능 만들고 등록화면과 디테일 화면에서 공통으로 쓰는 것들 컴포넌트화 할것
 function DashBoardReg() {
 
   const [title, setTitle] = useState<string>('');

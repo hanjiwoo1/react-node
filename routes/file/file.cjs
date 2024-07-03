@@ -23,17 +23,23 @@ const upload = multer({ storage: storage, encoding: 'utf-8' });
 // router.post('/upload', upload.single('file'), (req, res) => {
 router.post('/upload', upload.array('files',5), (req, res) => {
 
-  const file = req.files;
+  const files = req.files;
 
-  console.log('file : ', file)
-  if (!file) {
+  // console.log('file : ', file)
+  if (!files) {
     return res.status(400).send('파일을 업로드해야 합니다.');
   }
 
+  let values = [];
   const insertSql = 'INSERT INTO files (originalname, filename, mimetype, size) VALUES (?, ?, ?, ?)';
-  const values = [file.originalname, file.filename, file.mimetype, file.size];
 
-  conn.query(insertSql, values, (err, result) =>{
+  files.forEach(file => {
+    values.push([file.originalname, file.filename, file.mimetype, file.size])
+  });
+
+  // const values = [file.originalname, file.filename, file.mimetype, file.size];
+
+  conn.query(insertSql, [values], (err, result) =>{
     if (err) {
       console.error('파일 저장 실패 :' + err.stack);
     }
