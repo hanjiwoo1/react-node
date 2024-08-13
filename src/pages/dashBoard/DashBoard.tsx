@@ -1,5 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
-import {getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {useEffect, useState} from "react";
 import {columns, posts} from "../../table/dashBoard/column.tsx";
 import {DataTable} from "../../table/dashBoard/DataTable.tsx";
 import {useNavigate} from "react-router-dom";
@@ -13,33 +12,33 @@ export interface ResponseData {
 function DashBoard() {
   const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_API_URL
-  const [{ pageIndex, pageSize }, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+  // const [{ pageIndex, pageSize }, setPagination] = useState({
+  //   pageIndex: 0,
+  //   pageSize: 20,
+  // });
   const [error, setError] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [resp, setData] = useState<ResponseData | null>(null);
 
-  const defaultData = useMemo(() => [], []);
+  // const defaultData = useMemo(() => [], []);
+  //
+  // const pagination = useMemo(
+  //   () => ({
+  //     pageIndex,
+  //     pageSize,
+  //   }),
+  //   [pageIndex, pageSize]
+  // );
 
-  const pagination = useMemo(
-    () => ({
-      pageIndex,
-      pageSize,
-    }),
-    [pageIndex, pageSize]
-  );
-
-  const table = useReactTable({
-    columns,
-    data: !error && !isLoading && resp ? resp.data : defaultData,
-    manualPagination: true,
-    onPaginationChange: setPagination,
-    getCoreRowModel: getCoreRowModel(),
-    pageCount: !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
-    state: { pagination },
-  });
+  // const table = useReactTable({
+  //   columns,
+  //   data: !error && !isLoading && resp ? resp.data : defaultData,
+  //   manualPagination: true,
+  //   onPaginationChange: setPagination,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   pageCount: !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
+  //   state: { pagination },
+  // });
 
   // console.log('table : ', table)
 
@@ -62,7 +61,7 @@ function DashBoard() {
         setLoading(false);
         console.error(err);
       });
-  }, [pageIndex, pageSize]);
+  }, []);
 
   return (
     <>
@@ -102,7 +101,10 @@ function DashBoard() {
       {isLoading && <p>Loading...</p>}
       {error && <p>Error loading data</p>}
       {!isLoading && !error && resp && (
-        <DataTable columns={columns} data={resp.data} />
+        <DataTable
+          columns={columns}
+          data={resp.data}
+        />
       )}
     </>
   );

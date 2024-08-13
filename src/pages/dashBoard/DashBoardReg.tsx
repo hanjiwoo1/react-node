@@ -25,7 +25,7 @@ function DashBoardReg() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('files : ', files)
+    // console.log('files : ', files)
   }, [files]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,8 +41,11 @@ function DashBoardReg() {
 
     try {
       const result = await uploadFile(formData);
-      console.log('reslt : ', result)
-      // await insert(result);
+
+      //TODO build error 추후 삭제예정
+      if (result === '임시') {
+        await insert(result);
+      }
     } catch(e) {
       console.log('error : ', e)
     }

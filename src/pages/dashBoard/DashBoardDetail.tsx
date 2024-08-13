@@ -1,8 +1,5 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { posts } from "../../table/dashBoard/column.tsx";
-import {uploadFile} from "../../lib/fileApi.ts";
-import {fetchApi} from "../../lib/fetchApi.ts";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -10,8 +7,6 @@ function DashBoardDetail() {
   const { id } = useParams();
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
-  const [file, setFile] = useState(null);
-  const [fileURL, setFileURL] = useState(null);
 
     useEffect(() => {
       fetch(`${baseUrl}/posts/detail/${id}`, {
