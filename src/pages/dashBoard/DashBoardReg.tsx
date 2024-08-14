@@ -31,40 +31,49 @@ function DashBoardReg() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('title',title)
-    formData.append('content',content)
-
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
+    if (files.length < 1) {
+      alert('파일을 업로드하세요.')
+      return
     }
 
-    try {
-      const result = await uploadFile(formData);
+    try{
+      const uploadResult = await handleFileUpload(files);
+      console.log('uploadResult : ', uploadResult)
 
-      //TODO build error 추후 삭제예정
-      if (result === '임시') {
-        await insert(result);
+      if (uploadResult.insertId) {
+        await insertData({title, content, insertId: uploadResult.insertId})
       }
-    } catch(e) {
-      console.log('error : ', e)
+
+    }catch(e){
+      console.error('에러 발생', e);
     }
-    // await insert(data); // 데이터 인서트
   };
 
-  const insert = async (data: { title: string; content: string; insertId: number | null }) => {
+  const handleFileUpload = async (files:File[])=>{
+    const formData = new FormData();
 
-    const result = await fetchApi<apiResponse>(`${baseUrl}/posts/insert`, data);
-    if (data.insertId !== null) {
-      updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
-    }
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+
+    const result = await uploadFile(formData);
+    return result
+
+  }
+
+  const insertData = async (data: { title: string; content: string; insertId: number | null }) => {
+
+    await fetchApi<apiResponse>(`${baseUrl}/posts/insert`, data);
+    // if (data.insertId !== null) {
+    //   updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
+    // }
 
     navigate("/dashBoard", { replace: true });
   };
 
-  const updateFileTable = async (result: apiResponse) => {
-    await fetchApi(`${baseUrl}/file/update`, result);
-  };
+  // const updateFileTable = async (result: apiResponse) => {
+  //   await fetchApi(`${baseUrl}/file/update`, result);
+  // };
 
   return (
     <form onSubmit={handleSubmit}>

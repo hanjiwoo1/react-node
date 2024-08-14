@@ -10,6 +10,8 @@ const conn = require('./routes/requestDB/db.cjs'),
   MySQLStore = require('express-mysql-session')(session),
   bcrypt = require('bcrypt');
 
+require('dotenv').config();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json()); // 없으면 req.body undefined
@@ -19,10 +21,11 @@ app.use(cors({
 }));
 
 const sessionStore = new MySQLStore(sessionOption);
+const sessionSecret = process.env.VITE_API_SESSION_SECRET;
 
 app.use(session({
   key: 'session_cookie_name',
-  secret: '~',
+  secret: sessionSecret,
   store: sessionStore,
   resave: false,
   saveUninitialized: false,
@@ -43,7 +46,6 @@ app.use('/file', fileRouter);
 app.get('/authCheck', (req, res) => {
 
   const sendData = {isLogin: ''};
-  // console.log('authcheck', req.session.isLogin)
   if (req.session.isLogin) {
     sendData.isLogin = true;
   } else {
@@ -66,8 +68,12 @@ app.post('/login', async (req, res) => {
     const loadUser = `SELECT * FROM USER WHERE userId = '${userId}'`;
     conn.query(loadUser, [userId], function (error, results, fields) {
 
+      console.log('results : ', results)
+      
       if (results.length > 0) {
         bcrypt.compare(password, results[0].password, (error, result) => {
+          console.log('error : ', error)
+          console.log('result : ', result)
           if (error) {
             console.error('bcrypt 비교 오류:', error);
             res.status(500).json({ ok: false, error: "서버 오류 발생" });
@@ -110,6 +116,9 @@ app.post('/sign', async (req, res) => {
         const hasedPw = bcrypt.hashSync(password, 10);
         conn.query(`INSERT INTO USER (userId, password)
                     VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
+          if (error) {
+            console.log('error : ', error)
+          }
           req.session.save(function () {
             sendData.isSuccess = true;
             res.send(sendData);
@@ -123,6 +132,8 @@ app.post('/sign', async (req, res) => {
   }
 
 });
+
+console.log('precess.env.NODE_ENV : ', process.env.NODE_DEV)
 
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, './dist')));
