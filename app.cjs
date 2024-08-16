@@ -68,12 +68,8 @@ app.post('/login', async (req, res) => {
     const loadUser = `SELECT * FROM USER WHERE userId = '${userId}'`;
     conn.query(loadUser, [userId], function (error, results, fields) {
 
-      console.log('results : ', results)
-      
       if (results.length > 0) {
         bcrypt.compare(password, results[0].password, (error, result) => {
-          console.log('error : ', error)
-          console.log('result : ', result)
           if (error) {
             console.error('bcrypt 비교 오류:', error);
             res.status(500).json({ ok: false, error: "서버 오류 발생" });
@@ -133,7 +129,7 @@ app.post('/sign', async (req, res) => {
 
 });
 
-console.log('precess.env.NODE_ENV : ', process.env.NODE_DEV)
+// console.log('precess.env.NODE_ENV : ', process.env.NODE_DEV)
 
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, './dist')));

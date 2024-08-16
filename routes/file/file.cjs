@@ -20,14 +20,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage, encoding: 'utf-8' });
 
-// router.post('/upload', upload.single('file'), (req, res) => {
 router.post('/upload', upload.array('files',5), (req, res) => {
 
   const files = req.files;
-  console.log('files : ', files)
-
-  let values = [];
   const insertSql = 'INSERT INTO files (originalname, filename, mimetype, size) VALUES ?';
+  let values = [];
 
   files.forEach(file => {
     values.push([file.originalname, file.filename, file.mimetype, file.size])
@@ -55,10 +52,8 @@ router.post('/update', async(req, res) => {
         console.error('파일정보등록 에러' + err.stack);
         return
       }
-      // console.log('파일등록정보 업데이트',);
       return res.json({ ok: true, result });
     })
-    // return res.json({ ok: true, data: queryData });
   }catch(error){
     console.log(error)
   }
