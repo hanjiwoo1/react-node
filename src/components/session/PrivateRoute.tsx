@@ -3,6 +3,7 @@ import { useAuth } from '../session/AuthContext.tsx';
 
 const PrivateRoute = () => {
   const { isAuthenticated, loading } = useAuth();
+  console.log('isAuthenticated : ', isAuthenticated)
 
   if (loading) {
     return <p>Loading...</p>;

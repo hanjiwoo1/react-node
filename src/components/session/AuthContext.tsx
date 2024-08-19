@@ -8,6 +8,8 @@ interface AuthContextType {
   loading: boolean;
   login: (credentials: { userId: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
+  user: string;
+
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -20,6 +22,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,8 +30,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/authCheck`, { withCredentials: true });
         setIsAuthenticated(response.data.isLogin);
+        console.log('response.data : ', response.data)
+        setUser(response.data.userId);
       } catch (error) {
         setIsAuthenticated(false);
+        setUser('');
       } finally {
         setLoading(false);
       }
@@ -38,8 +44,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: { userId: string; password: string }) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/login`, credentials, { withCredentials: true });
+      const loginResult = await axios.post(`${import.meta.env.VITE_API_URL}/login`, credentials, { withCredentials: true });
       setIsAuthenticated(true);
+      setUser(loginResult.data.userId);
       navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
@@ -50,6 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
       setIsAuthenticated(false);
+      setUser('');
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -57,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout, user }}>
       {children}
     </AuthContext.Provider>
   );

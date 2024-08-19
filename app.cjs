@@ -45,9 +45,10 @@ app.use('/file', fileRouter);
 
 app.get('/authCheck', (req, res) => {
 
-  const sendData = {isLogin: ''};
+  const sendData = {isLogin: '', userId : ''};
   if (req.session.isLogin) {
     sendData.isLogin = true;
+    sendData.userId = req.session.userId;
   } else {
     sendData.isLogin = false;
   }

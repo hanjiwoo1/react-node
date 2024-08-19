@@ -1,59 +1,28 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from './session/AuthContext.tsx';  // useAuth 훅을 불러옴
 
 export function LoginForm() {
-
-  const baseUrl = import.meta.env.VITE_API_URL
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  /**
-   * credentials: 'include' 옵션을 주지 않으면 백엔드에서 세션 값을 정상적으로 받아올 수 없습니다.
-   * 로그인 요청에서는 반드시 이 옵션을 사용하여 세션 쿠키를 포함해야 합니다.
-   */
+  const { login, user, loading } = useAuth();  // useAuth 훅을 통해 login 함수 사용
+
   useEffect(() => {
-    fetch(baseUrl + `/authCheck`, {
-      credentials: 'include' // 세션 쿠키 포함
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.isLogin == true) {
-          // setMode("WELCOME");
-          // console.log('세션있음 : ');
-          console.log('json : ', json)
-          navigate("/dashBoard", { replace: true });
-        } else {
-          // setMode("LOGIN");
-          // console.log('로그인 필요 : ');
-        }
-      });
-  }, []);
+    if (!loading && user) {
+      navigate('/dashBoard', {replace: true});
+    }
+  }, [user, loading, navigate]);
 
   const handleLogin = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-
-    const response = await fetch(
-      baseUrl +`/login`,
-      {
-        method: "POST",
-        credentials: 'include', // 세션 쿠키 포함
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: userId,
-          password: password,
-        }),
-      }
-    );
-    const result = await response.json();
-
-    // 로그인 성공 시 다음 페이지로 이동
-    if (result.isLogin) {
-      // navigate('/dashboard'); // 이동할 경로 설정
-      console.log('로그인성공 : ', )
-      navigate("/dashBoard", { replace: true });
+    try {
+      await login({ userId, password });  // login 함수 호출
+      navigate("/dashBoard", { replace: true });  // 로그인 성공 시 대시보드로 이동
+    } catch (error) {
+      console.error("Login failed:", error);
+      // 필요에 따라 에러 처리 추가 가능 (ex. 에러 메시지 표시)
     }
   }
 

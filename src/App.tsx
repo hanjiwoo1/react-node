@@ -8,24 +8,14 @@ import DashBoardReg from "./pages/dashBoard/DashBoardReg.tsx";
 import Layout from "./components/common/Layout.tsx";
 import PrivateRoute from "./components/session/PrivateRoute.tsx";
 
-// interface User{
-//   name: string;
-//   userId: string;
-// }
-
 function App() {
-
-  // const column: ColumnDef<User>[] = [
-  //   {id: 'name', header: '이름', accessorFn: (row: User) => row.name},
-  //   {id: 'userId', header: 'id', accessorFn: (row: User) => row.userId},
-  // ];
 
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<LoginForm />} />
-        <Route path="/sign" element={<Sign />} />
         <Route element={<PrivateRoute />}>
+          <Route path="/sign" element={<Sign />} />
           <Route path="/dashBoard" element={<DashBoard />} />
           <Route path="/dashBoard/detail/:id" element={<DashBoardDetail />} />
           <Route path="/dashBoard/reg" element={<DashBoardReg />} />
