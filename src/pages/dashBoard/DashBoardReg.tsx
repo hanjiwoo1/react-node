@@ -38,7 +38,6 @@ function DashBoardReg() {
 
     try{
       const uploadResult = await handleFileUpload(files);
-      console.log('uploadResult : ', uploadResult)
 
       if (uploadResult.insertId) {
         await insertData({title, content, insertId: uploadResult.insertId})

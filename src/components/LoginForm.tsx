@@ -21,6 +21,7 @@ export function LoginForm() {
         if (json.isLogin == true) {
           // setMode("WELCOME");
           // console.log('세션있음 : ');
+          console.log('json : ', json)
           navigate("/dashBoard", { replace: true });
         } else {
           // setMode("LOGIN");

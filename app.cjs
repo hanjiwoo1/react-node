@@ -54,20 +54,28 @@ app.get('/authCheck', (req, res) => {
   res.send(sendData);
 });
 
+app.post('/logout', async (req, res) => {
+  // 세션 삭제
+  req.session.destroy(function(err) {
+    if (err) {
+      console.error('세션 삭제 오류:', err);
+      res.status(500).json({ ok: false, error: "로그아웃 중 오류 발생" });
+      return;
+    }
+    // 로그아웃 성공 응답
+    res.json({ ok: true, message: "로그아웃 되었습니다." });
+  });
+});
+
+
 app.post('/login', async (req, res) => {
-  const {
-    userId,
-    password
-  } = req.body;
+  const { userId, password } = req.body;
 
-  const sendData = {isLogin: ''}
-
-  if (userId == '' || password == '') {
-    res.status(401).json({ok: false, error: "ID와 PW를 모두 입력해주세요."});
+  if (userId === '' || password === '') {
+    res.status(401).json({ ok: false, error: "ID와 PW를 모두 입력해주세요." });
   } else {
     const loadUser = `SELECT * FROM USER WHERE userId = '${userId}'`;
     conn.query(loadUser, [userId], function (error, results, fields) {
-
       if (results.length > 0) {
         bcrypt.compare(password, results[0].password, (error, result) => {
           if (error) {
@@ -75,31 +83,31 @@ app.post('/login', async (req, res) => {
             res.status(500).json({ ok: false, error: "서버 오류 발생" });
             return;
           }
-          // console.log('비밀번호대조 결과 : ', result)
 
           if (result) {
-            console.log('로그인성공 : ', )
             req.session.isLogin = true;
             req.session.userId = userId;
-            // console.log('req.session : ', req.session)
+
             req.session.save(function (err) {
               if (err) {
                 console.error('세션 저장 오류:', err);
                 res.status(500).json({ ok: false, error: "세션 저장 오류 발생" });
                 return;
               }
-              sendData.isLogin = true;
-              res.send(sendData);
+
+              res.json({ ok: true, isLogin: true, userId: userId });
             });
+          } else {
+            res.status(401).json({ ok: false, error: "비밀번호가 틀렸습니다." });
           }
         });
+      } else {
+        res.status(401).json({ ok: false, error: "사용자를 찾을 수 없습니다." });
       }
-
-      // res.json({ok:true, data: sendData})
-
     });
   }
 });
+
 
 app.post('/sign', async (req, res) => {
   const userId = req.body.userId;
@@ -110,8 +118,7 @@ app.post('/sign', async (req, res) => {
     conn.query(`SELECT * FROM USER WHERE userId = ?`, [userId], function (err, results, fields) {
       if (results.length <= 0) {
         const hasedPw = bcrypt.hashSync(password, 10);
-        conn.query(`INSERT INTO USER (userId, password)
-                    VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
+        conn.query(`INSERT INTO USER (userId, password) VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
           if (error) {
             console.log('error : ', error)
           }

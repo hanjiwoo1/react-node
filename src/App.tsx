@@ -1,10 +1,12 @@
 import './App.css'
 import LoginForm from "./components/LoginForm.tsx";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Sign from "./components/Sign.tsx";
 import DashBoard from "./pages/dashBoard/DashBoard.tsx";
 import DashBoardDetail from "./pages/dashBoard/DashBoardDetail.tsx";
 import DashBoardReg from "./pages/dashBoard/DashBoardReg.tsx";
+import Layout from "./components/common/Layout.tsx";
+import PrivateRoute from "./components/session/PrivateRoute.tsx";
 
 // interface User{
 //   name: string;
@@ -19,22 +21,17 @@ function App() {
   // ];
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      <Route element={<Layout />}>
         <Route path="/" element={<LoginForm />} />
         <Route path="/sign" element={<Sign />} />
-        <Route path="/dashBoard" element={<DashBoard />} />
-        <Route path="/dashBoard/detail/:id" element={<DashBoardDetail />} />
-        <Route path="/dashBoard/reg" element={<DashBoardReg />} />
-      </Routes>
-      {/* Uncomment your Table component once the routing issue is resolved */}
-      {/* <Table */}
-      {/*   name="UserTable" */}
-      {/*   data={getData} */}
-      {/*   columns={column} */}
-      {/*   noDataMessage="데이터가 없어요." */}
-      {/* /> */}
-    </BrowserRouter>
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashBoard" element={<DashBoard />} />
+          <Route path="/dashBoard/detail/:id" element={<DashBoardDetail />} />
+          <Route path="/dashBoard/reg" element={<DashBoardReg />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 

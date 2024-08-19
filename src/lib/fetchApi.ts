@@ -2,10 +2,10 @@ export async function fetchApi<T>(url: string, data: unknown): Promise<T> {
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(data),
     });
 
