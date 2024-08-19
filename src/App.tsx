@@ -14,8 +14,8 @@ function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<LoginForm />} />
+        <Route path="/sign" element={<Sign />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/sign" element={<Sign />} />
           <Route path="/dashBoard" element={<DashBoard />} />
           <Route path="/dashBoard/detail/:id" element={<DashBoardDetail />} />
           <Route path="/dashBoard/reg" element={<DashBoardReg />} />
