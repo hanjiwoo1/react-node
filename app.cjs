@@ -10,7 +10,9 @@ const conn = require('./routes/requestDB/db.cjs'),
   MySQLStore = require('express-mysql-session')(session),
   bcrypt = require('bcrypt');
 
-require('dotenv').config();
+// require('dotenv').config({
+//   path: `.env.${process.env.NODE_ENV}`
+// });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

@@ -3,8 +3,7 @@ import {useNavigate} from "react-router-dom";
 
 export function Sign() {
 
-  const registerUrl = "http://localhost:8080/sign";
-
+  const baseUrl = import.meta.env.VITE_API_URL
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,7 +18,7 @@ export function Sign() {
     }
 
     const response = await fetch(
-      registerUrl,
+      baseUrl + "/sign",
       {
         method: "POST",
         headers: {
