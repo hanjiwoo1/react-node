@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json()); // 없으면 req.body undefined
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173','http://223.130.150.7'],
   credentials: true
 }));
 
