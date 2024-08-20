@@ -1,9 +1,14 @@
+import fs from 'fs';
 import winston from "winston";
 import winstonDaily from "winston-daily-rotate-file";
 import appRoot from "app-root-path";
 const { createLogger } = winston;
 
 const logDir = `${appRoot}/logs`; // logs 디렉토리 하위에 로그 파일 저장
+
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
 
 const { combine, timestamp, printf, label } = winston.format; // winston.format의 내부 모듈을 가져옴
 
