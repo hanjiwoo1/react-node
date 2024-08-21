@@ -44,7 +44,7 @@ function DashBoard() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${baseUrl}/posts`, {
+    fetch(`${baseUrl}/api/posts`, {
       method: "POST",
       headers: {
         // "Content-Type": "application/json; charset=utf-8",

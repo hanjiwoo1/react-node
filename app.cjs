@@ -42,7 +42,7 @@ const postsRouter = require('./routes/posts.cjs');
 const fileRouter = require('./routes/file/file.cjs')
 // const indexRouter = require('./routes');
 
-app.use('/posts', postsRouter);
+app.use('/api/posts', postsRouter);
 app.use('/file', fileRouter);
 
 app.get('/authCheck', (req, res) => {
