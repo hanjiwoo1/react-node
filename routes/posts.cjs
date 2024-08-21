@@ -34,7 +34,6 @@ router.post('/insert', async(req, res) => {
     const values = [title, content,author, insertId];
     const insertSql = `INSERT INTO posts (title, content, author, fileId) VALUES (?,?,?,?)`
 
-    console.log('req.session.userId : ', req.session.userId)
     conn.query(insertSql, values, async (err, result) => {
       if (err) {
         console.error('게시판 글 등록 에러' + err.stack);

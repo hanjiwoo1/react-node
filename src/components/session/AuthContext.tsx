@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/authCheck`, { withCredentials: true });
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/authCheck`, { withCredentials: true });
         setIsAuthenticated(response.data.isLogin);
         // console.log('response.data : ', response.data)
         setUser(response.data.userId);
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: { userId: string; password: string }) => {
     try {
-      const loginResult = await axios.post(`${import.meta.env.VITE_API_URL}/login`, credentials, { withCredentials: true });
+      const loginResult = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/login`, credentials, { withCredentials: true });
       setIsAuthenticated(true);
       setUser(loginResult.data.userId);
       navigate('/');
@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/user/logout`, {}, { withCredentials: true });
       setIsAuthenticated(false);
       setUser('');
       navigate('/login');

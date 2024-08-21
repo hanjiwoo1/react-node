@@ -18,7 +18,7 @@ export function Sign() {
     }
 
     const response = await fetch(
-      baseUrl + "/sign",
+      baseUrl + "/api/user/sign",
       {
         method: "POST",
         headers: {
