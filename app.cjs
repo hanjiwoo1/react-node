@@ -8,7 +8,7 @@ const conn = require('./routes/requestDB/db.cjs'),
   sessionOption = require('./routes/sessionOption.cjs'),
   bodyParser = require("body-parser"),
   MySQLStore = require('express-mysql-session')(session),
-  bcrypt = require('bcrypt');
+  bcrypt = require('bcryptjs');
 
 // require('dotenv').config({
 //   path: `.env.${process.env.NODE_ENV}`
