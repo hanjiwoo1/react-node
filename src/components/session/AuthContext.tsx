@@ -9,28 +9,29 @@ interface AuthContextType {
   login: (credentials: { userId: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   user: string;
-
 }
-
-const AuthContext = createContext<AuthContextType | null>(null);
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+const AuthContext = createContext<AuthContextType | null>(null);
 // AuthProvider 컴포넌트
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState('');
   const navigate = useNavigate();
+  
+  const temp = import.meta.env.VITE_API_URL
+  console.log('temp : ', temp)
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/authCheck`, { withCredentials: true });
         setIsAuthenticated(response.data.isLogin);
-        console.log('response.data : ', response.data)
+        // console.log('response.data : ', response.data)
         setUser(response.data.userId);
       } catch (error) {
         setIsAuthenticated(false);
