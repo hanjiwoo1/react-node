@@ -23,9 +23,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState('');
   const navigate = useNavigate();
   
-  const temp = import.meta.env.VITE_API_URL
-  console.log('temp : ', temp)
-
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -50,7 +47,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(loginResult.data.userId);
       navigate('/');
     } catch (error) {
-      console.error('Login failed:', error);
+      // console.error('Login failed:', error);
+      alert('로그인 실패');
     }
   };
 

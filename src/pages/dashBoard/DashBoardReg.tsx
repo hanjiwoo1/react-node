@@ -62,7 +62,7 @@ function DashBoardReg() {
 
   const insertData = async (data: { title: string; content: string; insertId: number | null }) => {
 
-    await fetchApi<apiResponse>(`${baseUrl}/posts/insert`, data);
+    await fetchApi<apiResponse>(`${baseUrl}/api/posts/insert`, data);
     // if (data.insertId !== null) {
     //   updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
     // }

@@ -98,7 +98,6 @@ export function DataTable<TData, TValue>({
 
                   <chakra.span pl="4">
 
-                    ㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ
                   </chakra.span>
                 </Th>
               );

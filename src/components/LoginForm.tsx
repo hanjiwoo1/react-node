@@ -21,7 +21,7 @@ export function LoginForm() {
       await login({ userId, password });  // login 함수 호출
       navigate("/dashBoard", { replace: true });  // 로그인 성공 시 대시보드로 이동
     } catch (error) {
-      console.error("Login failed:", error);
+      // console.error("Login failed:", error);
       // 필요에 따라 에러 처리 추가 가능 (ex. 에러 메시지 표시)
     }
   }

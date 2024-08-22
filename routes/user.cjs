@@ -1,4 +1,3 @@
-// routes/user.cjs 파일에서 userRouter 정의 및 내보내기
 const express = require('express');
 const router = express.Router();
 const conn = require("./requestDB/db.cjs");
