@@ -1,0 +1,4 @@
+.image-gallery-image {
+  width: 200px; /* 필요에 따라 너비 조정 */
+  height: auto; /* 비율 유지 */
+}
