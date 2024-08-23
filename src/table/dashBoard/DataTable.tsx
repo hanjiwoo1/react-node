@@ -1,32 +1,24 @@
-"use client"
+import {ColumnDef, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import {Table, Tbody, Td, Th, Thead, Tr} from "@chakra-ui/react";
+import {Photo} from "../../pages/dashBoard/DashBoard.tsx";
+import ImageGallery from 'react-image-gallery';
 
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "../../components/ui/table"
-
-import {Table, Th, Thead, Tr, chakra, Tbody, Td} from "@chakra-ui/react";
+interface ColumnMeta{
+  isNumeric: boolean;
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  photo?: Photo | null
 }
 
-export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                         }: DataTableProps<TData, TValue>) {
+export function DataTable<TData extends {fileId:number}, TValue>({
+  columns,
+  data,
+  photo,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -34,57 +26,12 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    // <div className="rounded-md border">
-    //   <Table>
-    //     <TableHeader>
-    //       {table.getHeaderGroups().map((headerGroup) => (
-    //         <TableRow key={headerGroup.id}>
-    //           {headerGroup.headers.map((header) => {
-    //             return (
-    //               <TableHead key={header.id}>
-    //                 {header.isPlaceholder
-    //                   ? null
-    //                   : flexRender(
-    //                     header.column.columnDef.header,
-    //                     header.getContext()
-    //                   )}
-    //               </TableHead>
-    //             )
-    //           })}
-    //         </TableRow>
-    //       ))}
-    //     </TableHeader>
-    //     <TableBody>
-    //       {table.getRowModel().rows?.length ? (
-    //         table.getRowModel().rows.map((row) => (
-    //           <TableRow
-    //             key={row.id}
-    //             data-state={row.getIsSelected() && "selected"}
-    //           >
-    //             {row.getVisibleCells().map((cell) => (
-    //               <TableCell key={cell.id}>
-    //                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-    //               </TableCell>
-    //             ))}
-    //           </TableRow>
-    //         ))
-    //       ) : (
-    //         <TableRow>
-    //           <TableCell colSpan={columns.length} className="h-24 text-center">
-    //             No results.
-    //           </TableCell>
-    //         </TableRow>
-    //       )}
-    //     </TableBody>
-    //   </Table>
-    // </div>
     <Table>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-              const meta: any = header.column.columnDef.meta;
+              const meta: ColumnMeta = header.column.columnDef.meta as ColumnMeta;
               return (
                 <Th
                   key={header.id}
@@ -95,10 +42,6 @@ export function DataTable<TData, TValue>({
                     header.column.columnDef.header,
                     header.getContext()
                   )}
-
-                  <chakra.span pl="4">
-
-                  </chakra.span>
                 </Th>
               );
             })}
@@ -109,14 +52,24 @@ export function DataTable<TData, TValue>({
         {table.getRowModel().rows.map((row) => (
           <Tr key={row.id}>
             {row.getVisibleCells().map((cell) => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-              const meta: any = cell.column.columnDef.meta;
+              const meta: ColumnMeta = cell.column.columnDef.meta as ColumnMeta;
               return (
                 <Td key={cell.id} isNumeric={meta?.isNumeric}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Td>
               );
             })}
+            {photo && photo.results && photo.results.find((p) => p.id === row.original.fileId) && (
+              <Td>
+                <ImageGallery
+                  items={[
+                    {
+                      original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                    }
+                  ]}
+                />
+              </Td>
+            )}
           </Tr>
         ))}
       </Tbody>

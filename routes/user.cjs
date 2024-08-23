@@ -67,6 +67,7 @@ router.post('/sign', async (req, res) => {
   const sendData = { isSuccess: '' };
   if (userId && password) {
     conn.query(`SELECT * FROM USER WHERE userId = ?`, [userId], function (err, results, fields) {
+      console.log('results : ', results)
       if (results.length <= 0) {
         const hasedPw = bcrypt.hashSync(password, 10);
         conn.query(`INSERT INTO USER (userId, password) VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
@@ -79,7 +80,7 @@ router.post('/sign', async (req, res) => {
           });
         });
       } else {
-        sendData.isSuccess = '이미 존재하는 아이디 입니다.';
+        sendData.isSuccess = false;
         res.send(sendData);
       }
     });

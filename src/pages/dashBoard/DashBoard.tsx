@@ -1,7 +1,10 @@
 import {useEffect, useState} from "react";
-import {columns, posts} from "../../table/dashBoard/column.tsx";
-import {DataTable} from "../../table/dashBoard/DataTable.tsx";
+import {columns, posts} from "../../table/dashBoard/column";
+import {DataTable} from "../../table/dashBoard/DataTable";
 import {useNavigate} from "react-router-dom";
+import {fetchApi} from "../../lib/fetchApi";
+import './ImageGalleryStyles.css'
+import {ColumnDef} from "@tanstack/react-table";
 
 export interface ResponseData {
   ok: boolean;
@@ -9,59 +12,60 @@ export interface ResponseData {
   data: posts[];
 }
 
+interface PhotoResult {
+  id: number;
+  originalname: string;
+  filename: string;
+  size: number;
+  mimetype: string;
+  postId: number;
+  filepath: string;
+}
+
+// Update the Photo interface to use the PhotoResult type
+export interface Photo {
+  results: PhotoResult[];
+}
+
 function DashBoard() {
   const navigate = useNavigate();
-  const baseUrl = import.meta.env.VITE_API_URL
-  // const [{ pageIndex, pageSize }, setPagination] = useState({
-  //   pageIndex: 0,
-  //   pageSize: 20,
-  // });
+  const baseUrl = import.meta.env.VITE_API_URL;
   const [error, setError] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [resp, setData] = useState<ResponseData | null>(null);
-
-  // const defaultData = useMemo(() => [], []);
-  //
-  // const pagination = useMemo(
-  //   () => ({
-  //     pageIndex,
-  //     pageSize,
-  //   }),
-  //   [pageIndex, pageSize]
-  // );
-
-  // const table = useReactTable({
-  //   columns,
-  //   data: !error && !isLoading && resp ? resp.data : defaultData,
-  //   manualPagination: true,
-  //   onPaginationChange: setPagination,
-  //   getCoreRowModel: getCoreRowModel(),
-  //   pageCount: !error && !isLoading && resp ? Math.ceil(resp.totalCount / pageSize) : -1,
-  //   state: { pagination },
-  // });
-
-  // console.log('table : ', table)
+  const [photo, setPhoto] = useState<Photo | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`${baseUrl}/api/posts`, {
-      method: "POST",
-      headers: {
-        // "Content-Type": "application/json; charset=utf-8",
-        Accept: "application / json",
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((res: ResponseData) => {
-        setData(res);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchApi(`${baseUrl}/api/posts`, {});
+        // @ts-expect-error: TypeScript error expected due to unknown type
+        if (response.ok) {
+          // @ts-expect-error: TypeScript error expected due to unknown type
+          setData(response);
+        } else {
+          setError(true);
+        }
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (e) {
         setError(true);
         setLoading(false);
-        console.error(err);
-      });
+      }
+    }
+    fetchData().catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    const filesData = async () => {
+      try {
+        const response = await fetchApi<Photo>(`${baseUrl}/api/file/getFiles`, {});
+        setPhoto(response);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+      }
+    };
+    filesData().catch(console.error);
   }, []);
 
   return (
@@ -69,22 +73,25 @@ function DashBoard() {
       <div className="flex justify-end">
         <button
           className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 mt-0.5"
-          onClick={() => navigate('/dashBoard/reg')}
+          onClick={() => navigate("/dashBoard/reg")}
         >
           등록
         </button>
       </div>
-
       {isLoading && <p>Loading...</p>}
       {error && <p>Error loading data</p>}
       {!isLoading && !error && resp && (
-        <DataTable
-          columns={columns}
-          data={resp.data}
-        />
+        <>
+          <DataTable
+            columns={columns as ColumnDef<{ fileId: number }, unknown>[]}
+            data={resp.data as unknown as { fileId: number }[]}
+            photo={photo}
+          />
+        </>
       )}
     </>
   );
 }
+
 
 export default DashBoard;

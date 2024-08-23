@@ -1,14 +1,22 @@
-const conn = require("./db.cjs");
+const pool = require('./db.cjs');
 
-const executeQuery = (query) => {
+const executeQuery = (query, params) => {
   return new Promise((resolve, reject) => {
-    conn.query(query, (err, rows) => {
+    pool.getConnection((err, connection) => {
       if (err) {
         reject(err);
         return;
       }
-      resolve(rows);
+      connection.query(query, params, (queryErr, rows) => {
+        connection.release();
+        if (queryErr) {
+          reject(queryErr);
+          return;
+        }
+        resolve(rows);
+      });
     });
   });
 };
+
 module.exports = executeQuery;

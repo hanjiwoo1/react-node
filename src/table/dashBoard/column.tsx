@@ -38,4 +38,5 @@ export const columns: ColumnDef<posts>[] = [
     accessorKey: "author",
     header: "Author",
   },
+
 ]

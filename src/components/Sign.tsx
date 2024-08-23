@@ -1,5 +1,12 @@
-import { useState } from "react";
+import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {fetchApi} from "../lib/fetchApi.ts";
+
+interface signData{
+  userId: string;
+  password: string;
+  isSuccess: boolean;
+}
 
 export function Sign() {
 
@@ -17,25 +24,18 @@ export function Sign() {
       return;
     }
 
-    const response = await fetch(
-      baseUrl + "/api/user/sign",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: userId,
-          password: password,
-        }),
-      }
-    );
-    const result = await response.json();
-    console.log('result : ', result);
-    if (result.isSuccess) {
-      navigate('/'); // 이동할 경로 설정
-    }
+    const data     = {
+      userId: userId,
+      password: password,
+  };
 
+    const response = await fetchApi<signData>(baseUrl+"/api/user/sign", data)
+    if (response.isSuccess) {
+      alert('회원가입에 성공하였습니다.');
+      navigate('/');
+    }else{
+      alert('회원가입에 실패하였습니다.');
+    }
   }
 
   return (

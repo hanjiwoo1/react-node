@@ -1,20 +1,32 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-const conn = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.VITE_DB_HOST,
   user: process.env.VITE_DB_USER,
   password: process.env.VITE_DB_PASS,
   database: process.env.VITE_DB_SCHEMA,
   multipleStatements: true,
-});
-// conn.connect();
-conn.connect(function(err) {
-  if (err) {
-    console.error('Error connecting to database: ' + err.stack);
-    return;
-  }
-  // console.log('Connected to database as ID ' + conn.threadId);
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-module.exports = conn;
+function keepAlive() {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection from pool: ' + err.stack);
+      return;
+    }
+    connection.ping((pingErr) => {
+      if (pingErr) {
+        console.error('Error pinging database: ' + pingErr.stack);
+      }
+      connection.release();
+    });
+  });
+}
+
+setInterval(keepAlive, 60 * 1000);
+
+module.exports = pool;

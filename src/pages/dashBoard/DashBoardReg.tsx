@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {uploadFile} from "../../lib/fileApi.ts";
 import {fetchApi} from "../../lib/fetchApi.ts";
 import {useNavigate} from "react-router-dom";
@@ -24,25 +24,17 @@ function DashBoardReg() {
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // console.log('files : ', files)
-  }, [files]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (files.length < 1) {
       alert('파일을 업로드하세요.')
       return
     }
-
     try{
       const uploadResult = await handleFileUpload(files);
-
       if (uploadResult.insertId) {
         await insertData({title, content, insertId: uploadResult.insertId})
       }
-
     }catch(e){
       console.error('에러 발생', e);
     }
@@ -50,29 +42,20 @@ function DashBoardReg() {
 
   const handleFileUpload = async (files:File[])=>{
     const formData = new FormData();
-
     files.forEach(file => {
       formData.append('files', file);
     });
-
     const result = await uploadFile(formData);
     return result
-
   }
 
   const insertData = async (data: { title: string; content: string; insertId: number | null }) => {
-
     await fetchApi<apiResponse>(`${baseUrl}/api/posts/insert`, data);
     // if (data.insertId !== null) {
     //   updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
     // }
-
     navigate("/dashBoard", { replace: true });
   };
-
-  // const updateFileTable = async (result: apiResponse) => {
-  //   await fetchApi(`${baseUrl}/file/update`, result);
-  // };
 
   return (
     <form onSubmit={handleSubmit}>

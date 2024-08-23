@@ -23,13 +23,13 @@ const upload = multer({ storage: storage, encoding: 'utf-8' });
 router.post('/upload', upload.array('files',5), (req, res) => {
 
   const files = req.files;
-  const insertSql = 'INSERT INTO files (originalname, filename, mimetype, size) VALUES ?';
+  const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
   let values = [];
 
   files.forEach(file => {
-    values.push([file.originalname, file.filename, file.mimetype, file.size])
+    const filePath = path.join('uploads', file.filename);
+    values.push([file.originalname, file.filename, filePath, file.mimetype, file.size]);
   });
-
   conn.query(insertSql, [values], (err, result) =>{
     if (err) {
       console.error('파일 저장 실패 :' + err.stack);
@@ -58,5 +58,21 @@ router.post('/update', async(req, res) => {
     console.log(error)
   }
 })
+
+router.post('/getFiles', async (req, res) => {
+  try {
+    const sql = `SELECT * FROM files`;
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('파일정보 조회 에러' + err.stack);
+        return res.status(500).json({ ok: false, error: err.message });
+      }
+      return res.json({ ok: true, results });
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ ok: false, error: error.message });
+  }
+});
 
 module.exports = router;
