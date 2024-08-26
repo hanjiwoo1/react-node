@@ -64,7 +64,8 @@ export function DataTable<TData extends {fileId:number}, TValue>({
                 <ImageGallery
                   items={[
                     {
-                      original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                      // original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                      original: `${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
                     }
                   ]}
                 />
