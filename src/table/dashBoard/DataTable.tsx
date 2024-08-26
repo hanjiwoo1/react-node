@@ -3,6 +3,7 @@ import {ColumnDef, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/
 import {Table, Tbody, Td, Th, Thead, Tr} from "@chakra-ui/react";
 import {Photo} from "../../pages/dashBoard/DashBoard.tsx";
 import ImageGallery from 'react-image-gallery';
+import {useEffect} from "react";
 
 interface ColumnMeta{
   isNumeric: boolean;
@@ -24,6 +25,13 @@ export function DataTable<TData extends {fileId:number}, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
+
+  useEffect(() => {
+    console.log('Current URL:', window.location.href);
+    console.log('Current Pathname:', window.location.pathname);
+    console.log('Current Origin:', window.location.origin);
+  }, []);
+
 
   return (
     <Table>
@@ -64,8 +72,8 @@ export function DataTable<TData extends {fileId:number}, TValue>({
               <ImageGallery
                 items={[
                   {
-                    original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
-                    // original: `${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                    // original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                    original: `${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
                   }
                 ]}
               />
