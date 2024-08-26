@@ -60,6 +60,7 @@ function DashBoard() {
     const filesData = async () => {
       try {
         const response = await fetchApi<Photo>(`${baseUrl}/api/file/getFiles`, {});
+        console.log('response: ', response)
         setPhoto(response);
       } catch (error) {
         console.error('Error fetching files:', error);
