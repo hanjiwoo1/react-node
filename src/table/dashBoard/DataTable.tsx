@@ -60,17 +60,17 @@ export function DataTable<TData extends {fileId:number}, TValue>({
               );
             })}
             {photo && photo.results && photo.results.find((p) => p.id === row.original.fileId) && (
-              <Td>
-                <ImageGallery
-                  items={[
-                    {
-                      // original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
-                      original: `${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
-                    }
-                  ]}
-                />
-              </Td>
-            )}
+            <Td>
+              <ImageGallery
+                items={[
+                  {
+                    original: `../../../${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                    // original: `${photo.results.find((p) => p.id === row.original.fileId)?.filepath}`,
+                  }
+                ]}
+              />
+            </Td>
+          )}
           </Tr>
         ))}
       </Tbody>
