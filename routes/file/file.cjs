@@ -8,16 +8,23 @@ const publicPath = path.join(__dirname, 'public');
 const uuid4 = require('uuid4');
 app.use(express.static(publicPath));
 
+require('dotenv').config();
+
 // multer 설정에 encoding 옵션 추가
 const storage = multer.diskStorage({
-  destination: 'uploads/',
+  destination: function (req, file, done) {
+    // 환경 변수에서 업로드 경로 가져오기
+    const uploadPath = process.env.VITE_UPLOAD_DIR || 'uploads/'; // 기본값은 'uploads/'로 설정
+    done(null, uploadPath);
+  },
   filename: function (req, file, done) {
-    const random = uuid4();
-    const ext = path.extname(file.originalname);
-    const fileName = random + ext;
+    const random = uuid4(); // 랜덤한 파일 이름 생성
+    const ext = path.extname(file.originalname); // 파일 확장자 유지
+    const fileName = random + ext; // 새 파일 이름 생성
     done(null, fileName);
   }
 });
+
 const upload = multer({ storage: storage, encoding: 'utf-8' });
 
 router.post('/upload', upload.array('files',5), (req, res) => {
