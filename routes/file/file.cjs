@@ -6,6 +6,7 @@ const app = express();
 const path = require('path');
 const publicPath = path.join(__dirname, 'public');
 const uuid4 = require('uuid4');
+const fs = require('fs');
 app.use(express.static(publicPath));
 
 require('dotenv').config();
@@ -15,13 +16,30 @@ const storage = multer.diskStorage({
   destination: function (req, file, done) {
     // 환경 변수에서 업로드 경로 가져오기
     const uploadPath = process.env.VITE_UPLOAD_DIR || 'uploads/'; // 기본값은 'uploads/'로 설정
+
+    // 디렉터리가 존재하지 않으면 생성
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
     done(null, uploadPath);
   },
   filename: function (req, file, done) {
-    const random = uuid4(); // 랜덤한 파일 이름 생성
-    const ext = path.extname(file.originalname); // 파일 확장자 유지
-    const fileName = random + ext; // 새 파일 이름 생성
-    done(null, fileName);
+    let originalName = file.originalname;
+    let uploadPath = process.env.VITE_UPLOAD_DIR || 'uploads/';
+    let filePath = path.join(uploadPath, originalName);
+
+    // 중복 이름 체크 및 변경 로직
+    let counter = 1;
+    while (fs.existsSync(filePath)) {
+      const ext = path.extname(originalName);
+      const baseName = path.basename(originalName, ext);
+      originalName = `${baseName}(${counter})${ext}`;
+      filePath = path.join(uploadPath, originalName);
+      counter++;
+    }
+
+    done(null, originalName);
   }
 });
 
