@@ -49,7 +49,7 @@ export function DataTable<TData extends {fileId:number}, TValue>({
       </Thead>
       <Tbody>
         {table.getRowModel().rows.map((row) => {
-          console.log('photo results filepath:', photo?.results.find((p) => p.id === row.original.fileId)?.filepath);
+          // console.log('photo results filepath:', photo?.results.find((p) => p.id === row.original.fileId)?.filepath);
           return (
             <Tr key={row.id}>
               {row.getVisibleCells().map((cell) => {

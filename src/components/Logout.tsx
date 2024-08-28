@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
-import {Button} from "@chakra-ui/react";
+import {IconButton, Tooltip} from "@chakra-ui/react";
 import {useAuth} from "./session/AuthContext.tsx";
+import {FaSignOutAlt} from "react-icons/fa";
 
 export default function Logout() {
   const navigate = useNavigate();
@@ -14,34 +15,24 @@ export default function Logout() {
       console.error("Login failed:", error);
       // 필요에 따라 에러 처리 추가 가능 (ex. 에러 메시지 표시)
     }
-    // await fetch(
-    //   baseUrl + `/logout`,
-    //   {
-    //     method: "POST",
-    //     credentials: 'include', // 세션 쿠키 포함
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: ''
-    //   }
-    // );
-    // navigate('/');
   }
 
   return (
     <div className="absolute top-4 right-4">
       {user &&
         <>
-          <span>{user}</span>
-          <Button
-            onClick={() => {
-              handleLogout()
-            }}
-            colorScheme='blue'
-            size='sm'
-          >
-            Logout
-          </Button>
+          {user}
+          <Tooltip label="Log out" aria-label="A tooltip">
+            <IconButton
+              aria-label="Log out"
+              icon={<FaSignOutAlt />}
+              size="sm"
+              colorScheme="red"
+              variant="solid"
+              isRound
+              onClick={() => handleLogout()}
+            />
+          </Tooltip>
         </>
       }
     </div>

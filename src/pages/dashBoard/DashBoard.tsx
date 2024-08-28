@@ -3,7 +3,7 @@ import {columns, posts} from "../../table/dashBoard/column";
 import {DataTable} from "../../table/dashBoard/DataTable";
 import {useNavigate} from "react-router-dom";
 import {fetchApi} from "../../lib/fetchApi";
-import './ImageGalleryStyles.css'
+import {Box, Button, Spinner, Text, VStack} from "@chakra-ui/react";
 import {ColumnDef} from "@tanstack/react-table";
 
 export interface ResponseData {
@@ -70,29 +70,28 @@ function DashBoard() {
   }, []);
 
   return (
-    <>
-      <div className="flex justify-end">
-        <button
-          className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 mt-0.5"
+    <VStack spacing={4} align="stretch">
+      <Box display="flex" justifyContent="flex-end" width="100%">
+        <Button
+          colorScheme="blue"
           onClick={() => navigate("/dashBoard/reg")}
         >
           등록
-        </button>
-      </div>
-      {isLoading && <p>Loading...</p>}
-      {error && <p>Error loading data</p>}
+        </Button>
+      </Box>
+      {isLoading && <Spinner size="xl" />}
+      {error && <Text color="red.500">Error loading data</Text>}
       {!isLoading && !error && resp && (
-        <>
+        <Box width="100%">
           <DataTable
             columns={columns as ColumnDef<{ fileId: number }, unknown>[]}
             data={resp.data as unknown as { fileId: number }[]}
             photo={photo}
           />
-        </>
+        </Box>
       )}
-    </>
+    </VStack>
   );
 }
-
 
 export default DashBoard;

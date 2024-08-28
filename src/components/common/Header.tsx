@@ -1,13 +1,26 @@
-import {Link} from "react-router-dom";
+import {Box, Flex, Heading, HStack, Spacer} from '@chakra-ui/react';
 import Logout from "../Logout.tsx";
+import {useNavigate} from "react-router-dom";
 
-export default function Header() {
+const Header = () => {
+  const navigate = useNavigate();
   return (
-    <header className="min-h-20">
-      <Link to="/">
-        home
-      </Link>
-      <Logout />
-    </header>
+    <Box bg="lightskyblue" p={4} color="white">
+      <Flex alignItems="center">
+        <Heading
+          size="md"
+          onClick={() => {
+            navigate('/')
+          }}
+        >Home
+        </Heading>
+        <Spacer />
+        <HStack spacing={4}>
+          <Logout />
+        </HStack>
+      </Flex>
+    </Box>
   );
-}
+};
+
+export default Header;

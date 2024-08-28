@@ -1,94 +1,123 @@
-import React, {useState} from "react";
-import {uploadFile} from "../../lib/fileApi.ts";
-import {fetchApi} from "../../lib/fetchApi.ts";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from "react";
+import { uploadFile } from "../../lib/fileApi.ts";
+import { fetchApi } from "../../lib/fetchApi.ts";
+import { useNavigate } from "react-router-dom";
 import FileUpload from "../../components/FileUpload.tsx";
+import {
+  Box,
+  Button,
+  Input,
+  Textarea,
+  VStack,
+  FormControl,
+  FormLabel,
+  useToast,
+} from "@chakra-ui/react";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 interface apiResponse {
   ok: boolean;
   data: {
-    id : number;
+    id: number;
     title: string;
     content: string;
     fileId: number;
   };
   error?: string;
 }
-// TODO 파일업로드기능 만들고 등록화면과 디테일 화면에서 공통으로 쓰는 것들 컴포넌트화 할것
-function DashBoardReg() {
 
-  const [title, setTitle] = useState<string>('');
-  const [content, setContent] = useState<string>('');
+function DashBoardReg() {
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (files.length < 1) {
-      alert('파일을 업로드하세요.')
-      return
+      toast({
+        title: "파일을 업로드하세요.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     }
-    try{
+    try {
       const uploadResult = await handleFileUpload(files);
       if (uploadResult.insertId) {
-        await insertData({title, content, insertId: uploadResult.insertId})
+        await insertData({ title, content, insertId: uploadResult.insertId });
       }
-    }catch(e){
-      console.error('에러 발생', e);
+    } catch (e) {
+      console.error("에러 발생", e);
     }
   };
 
-  const handleFileUpload = async (files:File[])=>{
+  const handleFileUpload = async (files: File[]) => {
     const formData = new FormData();
-    files.forEach(file => {
-      formData.append('files', file);
+    files.forEach((file) => {
+      formData.append("files", file);
     });
     const result = await uploadFile(formData);
-    return result
-  }
+    return result;
+  };
 
-  const insertData = async (data: { title: string; content: string; insertId: number | null }) => {
+  const insertData = async (data: {
+    title: string;
+    content: string;
+    insertId: number | null;
+  }) => {
     await fetchApi<apiResponse>(`${baseUrl}/api/posts/insert`, data);
-    // if (data.insertId !== null) {
-    //   updateFileTable(result); // 파일이 있을 때만 파일 테이블 업데이트
-    // }
     navigate("/dashBoard", { replace: true });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden m-4">
-        <div className="px-6 py-4">
-          <input
-            type="text"
-            name="title"
-            className="font-bold text-xl mb-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-          />
-          <textarea
-            name="content"
-            className="text-gray-700 text-base bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
-            rows={6}
-            value={content}
-            onChange={e => setContent(e.target.value)}
-          />
-        </div>
-        <FileUpload
-          file={files}
-          setFile={setFiles}
-        />
-        <div className="px-6 py-4">
-          <button
+      <Box
+        maxW="sm"
+        mx="auto"
+        bg="white"
+        shadow="md"
+        rounded="lg"
+        overflow="hidden"
+        mt="4"
+        p="6"
+      >
+        <VStack spacing="4">
+          <FormControl id="title">
+            <FormLabel>제목</FormLabel>
+            <Input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              borderColor="gray.300"
+              focusBorderColor="blue.500"
+            />
+          </FormControl>
+          <FormControl id="content">
+            <FormLabel>내용</FormLabel>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              borderColor="gray.300"
+              focusBorderColor="blue.500"
+              rows={6}
+            />
+          </FormControl>
+          <FileUpload file={files} setFile={setFiles} />
+          <Button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            colorScheme="blue"
+            width="full"
+            mt="4"
+            size="md"
           >
             저장하기
-          </button>
-        </div>
-      </div>
+          </Button>
+        </VStack>
+      </Box>
     </form>
   );
 }

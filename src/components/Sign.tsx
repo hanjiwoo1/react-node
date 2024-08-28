@@ -1,87 +1,113 @@
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {fetchApi} from "../lib/fetchApi.ts";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchApi } from "../lib/fetchApi.ts";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
 
-interface signData{
+interface signData {
   userId: string;
   password: string;
   isSuccess: boolean;
 }
 
 export function Sign() {
-
-  const baseUrl = import.meta.env.VITE_API_URL
-  const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const baseUrl = import.meta.env.VITE_API_URL;
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleRegister = async (event: { preventDefault: () => void; }) => {
+  const handleRegister = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      toast({
+        title: "비밀번호 오류",
+        description: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
       return;
     }
 
-    const data     = {
+    const data = {
       userId: userId,
       password: password,
+    };
+
+    const response = await fetchApi<signData>(baseUrl + "/api/user/sign", data);
+    if (response.isSuccess) {
+      toast({
+        title: "회원가입 성공",
+        description: "회원가입에 성공하였습니다.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      navigate("/");
+    } else {
+      toast({
+        title: "회원가입 실패",
+        description: "회원가입에 실패하였습니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
-    const response = await fetchApi<signData>(baseUrl+"/api/user/sign", data)
-    if (response.isSuccess) {
-      alert('회원가입에 성공하였습니다.');
-      navigate('/');
-    }else{
-      alert('회원가입에 실패하였습니다.');
-    }
-  }
-
   return (
-    <div className="bg-gray-100 min-h-screen flex justify-center items-center">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">회원가입</h2>
+    <Box bg="gray.100" minH="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box bg="white" p="8" rounded="md" shadow="md" w="md">
+        <Heading as="h2" size="lg" mb="6" textAlign="center">
+          회원가입
+        </Heading>
         <form onSubmit={handleRegister}>
-          <div className="mb-4">
-            <label htmlFor="userId" className="block text-gray-600">사용자명</label>
-            <input
-              type="text"
-              id="userId"
-              name="userId"
-              className="w-full mt-1 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-              onChange={(e) => setUserId(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-600">비밀번호</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full mt-1 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="confirmPassword" className="block text-gray-600">비밀번호 확인</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              className="w-full mt-1 px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-          >
-            회원가입
-          </button>
+          <VStack spacing="4">
+            <FormControl id="userId">
+              <FormLabel>사용자명</FormLabel>
+              <Input
+                type="text"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                focusBorderColor="blue.500"
+              />
+            </FormControl>
+            <FormControl id="password">
+              <FormLabel>비밀번호</FormLabel>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                focusBorderColor="blue.500"
+              />
+            </FormControl>
+            <FormControl id="confirmPassword">
+              <FormLabel>비밀번호 확인</FormLabel>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                focusBorderColor="blue.500"
+              />
+            </FormControl>
+            <Button type="submit" colorScheme="blue" width="full">
+              회원가입
+            </Button>
+          </VStack>
         </form>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 

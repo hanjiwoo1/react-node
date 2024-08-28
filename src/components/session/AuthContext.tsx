@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {useToast} from "@chakra-ui/react";
 
 // AuthContext의 타입 선언
 interface AuthContextType {
@@ -22,11 +23,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState('');
   const navigate = useNavigate();
+  const baseUrl = import.meta.env.VITE_API_URL
+  const toast = useToast();
   
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/user/authCheck`, { withCredentials: true });
+        const response = await axios.get(`${baseUrl}/api/user/authCheck`, { withCredentials: true });
         setIsAuthenticated(response.data.isLogin);
         // console.log('response.data : ', response.data)
         setUser(response.data.userId);
@@ -42,19 +45,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: { userId: string; password: string }) => {
     try {
-      const loginResult = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/login`, credentials, { withCredentials: true });
+      const loginResult = await axios.post(`${baseUrl}/api/user/login`, credentials, { withCredentials: true });
       setIsAuthenticated(true);
       setUser(loginResult.data.userId);
       navigate('/');
     } catch (error) {
       // console.error('Login failed:', error);
-      alert('로그인 실패');
+      toast({
+        title: "로그인 실패",
+        description: "사용자명 또는 비밀번호가 잘못되었습니다.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/user/logout`, {}, { withCredentials: true });
+      await axios.post(`${baseUrl}/api/user/logout`, {}, { withCredentials: true });
       setIsAuthenticated(false);
       setUser('');
       navigate('/login');
