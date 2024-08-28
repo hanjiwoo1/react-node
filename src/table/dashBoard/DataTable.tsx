@@ -2,6 +2,7 @@ import {ColumnDef, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/
 import {Table, Tbody, Td, Th, Thead, Tr} from "@chakra-ui/react";
 import {Photo} from "../../pages/dashBoard/DashBoard.tsx";
 import ImageGallery from 'react-image-gallery';
+import './ImageGalleryStyles.css'
 
 interface ColumnMeta{
   isNumeric: boolean;
