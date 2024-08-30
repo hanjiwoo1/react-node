@@ -16,7 +16,7 @@ import {
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
-interface apiResponse {
+export interface apiResponse {
   ok: boolean;
   data: {
     id: number;

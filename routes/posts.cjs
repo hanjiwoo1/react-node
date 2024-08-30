@@ -48,4 +48,28 @@ router.post('/insert', async(req, res) => {
   }
 })
 
+router.post('/update', async(req, res) => {
+  try{
+    const title = req.body.title
+    const content = req.body.content
+    const insertId = req.body.insertId
+    const id = req.body.id
+    const author = req.session.userId
+    const values = [title, content,author, insertId, id];
+    const updateSql = `UPDATE posts SET title = ?, content = ?, author = ?, fileId = ? WHERE id = ?`;
+
+    conn.query(updateSql, values, async (err, result) => {
+      if (err) {
+        console.error('게시판 글 수정 에러' + err.stack);
+      }
+      // console.log('게시판 등록 성공',);
+      const select = await executeQuery(`SELECT * FROM posts WHERE id = ${result.insertId}`)
+      return res.json({ok: true, result : select});
+    })
+    // return res.json({ ok: true, data: queryData });
+  }catch(error){
+    console.log(error)
+  }
+})
+
 module.exports = router

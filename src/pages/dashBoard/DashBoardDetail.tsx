@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -12,6 +12,9 @@ import {
 } from "@chakra-ui/react";
 import {fetchApiGet} from "../../lib/fetchAPiGet.ts";
 import FileUpload, {ServerFile} from "../../components/FileUpload.tsx";
+import {uploadFile} from "../../lib/fileApi.ts";
+import {fetchApi} from "../../lib/fetchApi.ts";
+import {apiResponse} from "./DashBoardReg.tsx";
 
 interface Post{
   title: string;
@@ -32,6 +35,7 @@ function DashBoardDetail() {
   const [files, setFiles] = useState<(File | ServerFile)[]>([]);
   const toast = useToast();
   const baseUrl = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,15 +49,46 @@ function DashBoardDetail() {
   }, []);
 
 
+  const handleFileUpload = async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+    const result = await uploadFile(formData);
+    return result;
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your submit logic here
-    toast({
-      title: "저장되었습니다.",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+    if (files.length < 1) {
+      toast({
+        title: "파일을 업로드하세요.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    handleFileUpload(files.filter((file): file is File => file instanceof File))
+      .then((uploadResult) => {
+        if (uploadResult.insertId) {
+          updateData({title, content, id, insertId: uploadResult.insertId}).then(r => console.log(r));
+        }
+      })
+      .catch((e) => {
+        console.error("에러 발생", e);
+      });
+  };
+
+
+  const updateData = async (data: {
+    title: string;
+    content: string;
+    id: string | undefined;
+    insertId: number | null;
+  }) => {
+    await fetchApi<apiResponse>(`${baseUrl}/api/posts/update`, data);
+    navigate("/dashBoard", { replace: true });
   };
 
   return (
