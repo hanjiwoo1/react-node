@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {columns, posts} from "../../table/dashBoard/column";
 import {DataTable} from "../../table/dashBoard/DataTable";
 import {useNavigate} from "react-router-dom";
-import {fetchApi} from "../../lib/fetchApi";
+import {fetchApi} from "../../lib/fetchApi.ts";
 import {Box, Button, Spinner, Text, VStack} from "@chakra-ui/react";
 import {ColumnDef} from "@tanstack/react-table";
 
@@ -60,7 +60,7 @@ function DashBoard() {
     const filesData = async () => {
       try {
         const response = await fetchApi<Photo>(`${baseUrl}/api/file/getFiles`, {});
-        console.log('response: ', response)
+        // console.log('response: ', response)
         setPhoto(response);
       } catch (error) {
         console.error('Error fetching files:', error);

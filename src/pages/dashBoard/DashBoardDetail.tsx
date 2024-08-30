@@ -1,72 +1,109 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Textarea,
+  VStack,
+  FormControl,
+  FormLabel,
+  useToast,
+} from "@chakra-ui/react";
+import {fetchApiGet} from "../../lib/fetchAPiGet.ts";
+import FileUpload, {ServerFile} from "../../components/FileUpload.tsx";
 
-const baseUrl = import.meta.env.VITE_API_URL;
+interface Post{
+  title: string;
+  content: string;
+}
+
+interface ApiResponse{
+  data:{
+    posts: Post[];
+    files: File[];
+  }
+}
 
 function DashBoardDetail() {
   const { id } = useParams();
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
+  const [files, setFiles] = useState<(File | ServerFile)[]>([]);
+  const toast = useToast();
+  const baseUrl = import.meta.env.VITE_API_URL;
 
-    useEffect(() => {
-      fetch(`${baseUrl}/posts/detail/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        credentials: "include",
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          setTitle(res.data.posts[0].title)
-          setContent(res.data.posts[0].content)
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }, []);
-
-   const handleSubmit = () =>{
-
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetchApiGet<ApiResponse>(`${baseUrl}/api/posts/detail/${id}`);
+      // console.log('response : ', response)
+      setTitle(response.data.posts[0].title || '');
+      setContent(response.data.posts[0].content || '');
+      setFiles([response.data.files[0]]);
     }
+    fetchData().catch(console.error);
+  }, []);
+
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Add your submit logic here
+    toast({
+      title: "저장되었습니다.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit}>
-      <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden m-4">
-        <div className="px-6 py-4">
-          <input
-            type="text"
-            name="title"
-            className="font-bold text-xl mb-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
+      <Box
+        maxW="sm"
+        mx="auto"
+        bg="white"
+        shadow="md"
+        rounded="lg"
+        overflow="hidden"
+        mt="4"
+        p="6"
+      >
+        <VStack spacing="4">
+          <FormControl id="title">
+            <FormLabel>제목</FormLabel>
+            <Input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              borderColor="gray.300"
+              focusBorderColor="blue.500"
+            />
+          </FormControl>
+          <FormControl id="content">
+            <FormLabel>내용</FormLabel>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              borderColor="gray.300"
+              focusBorderColor="blue.500"
+              rows={6}
+            />
+          </FormControl>
+          <FileUpload
+            file={files}
+            setFile={setFiles}
           />
-          <textarea
-            name="content"
-            className="text-gray-700 text-base bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
-            rows={6}
-            value={content}
-            onChange={e => setContent(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            파일 선택
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            type="file"
-            name="file"
-          />
-        </div>
-        <div className="px-6 py-4">
-          <button
+          <Button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            colorScheme="blue"
+            width="full"
+            mt="4"
+            size="md"
           >
             저장하기
-          </button>
-        </div>
-      </div>
+          </Button>
+        </VStack>
+      </Box>
     </form>
   );
 }

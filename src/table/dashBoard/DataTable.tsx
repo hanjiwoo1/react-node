@@ -26,7 +26,7 @@ export function DataTable<TData extends {fileId:number}, TValue>({
   })
 
   return (
-    <Table>
+    <Table >
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>

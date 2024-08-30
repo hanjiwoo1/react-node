@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { uploadFile } from "../../lib/fileApi.ts";
 import { fetchApi } from "../../lib/fetchApi.ts";
 import { useNavigate } from "react-router-dom";
-import FileUpload from "../../components/FileUpload.tsx";
+import FileUpload, {ServerFile} from "../../components/FileUpload.tsx";
 import {
   Box,
   Button,
@@ -30,7 +30,7 @@ interface apiResponse {
 function DashBoardReg() {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<(File | ServerFile)[]>([]);
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -46,7 +46,7 @@ function DashBoardReg() {
       return;
     }
     try {
-      const uploadResult = await handleFileUpload(files);
+      const uploadResult = await handleFileUpload(files.filter((file): file is File => file instanceof File));
       if (uploadResult.insertId) {
         await insertData({ title, content, insertId: uploadResult.insertId });
       }
@@ -106,7 +106,10 @@ function DashBoardReg() {
               rows={6}
             />
           </FormControl>
-          <FileUpload file={files} setFile={setFiles} />
+          <FileUpload
+            file={files}
+            setFile={setFiles}
+          />
           <Button
             type="submit"
             colorScheme="blue"
