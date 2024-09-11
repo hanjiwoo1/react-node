@@ -1,5 +1,5 @@
 import { ResponseData } from "./PhotoGallery.tsx";
-import {Gallery, Item} from "react-photoswipe-gallery";
+import { Gallery, Item } from "react-photoswipe-gallery";
 
 interface ImagesProps {
   resp?: ResponseData | null,
@@ -39,18 +39,17 @@ const Post = ({ resp }: ImagesProps) => {
               <span className="username">{item.author}</span>
             </div>
             <div className="post-image">
-              {/*<img src={item.filepath} alt="Post" />*/}
-                 <Gallery>
-                   <Item
-                     original={`${dir}${item.filepath}`}
-                     thumbnail={`${dir}${item.filepath}`}
-                     width="1024"
-                     height="768"
-                   >
-                     {({ ref, open }) => (
-                       <img ref={ref} onClick={open} src={`${dir}${item.filepath}`} alt="Post" />
-                     )}
-                   </Item>
+              <Gallery>
+                <Item
+                  original={`${dir}${item.filepath}`}
+                  thumbnail={`${dir}${item.filepath}`}
+                  width="1024"
+                  height="768"
+                >
+                  {({ ref, open }) => (
+                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`${dir}${item.filepath}`} alt="Post" />
+                  )}
+                </Item>
               </Gallery>
             </div>
             <div className="post-actions">
