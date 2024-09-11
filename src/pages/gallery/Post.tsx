@@ -1,4 +1,5 @@
 import { ResponseData } from "./PhotoGallery.tsx";
+import {Gallery, Item} from "react-photoswipe-gallery";
 
 interface ImagesProps {
   resp?: ResponseData | null,
@@ -6,6 +7,8 @@ interface ImagesProps {
 
 const Post = ({ resp }: ImagesProps) => {
   console.log('resp : ', resp);
+
+  const dir = import.meta.env.VITE_UPLOAD_DIR;
 
   const samplePost = {
     user: {
@@ -36,7 +39,19 @@ const Post = ({ resp }: ImagesProps) => {
               <span className="username">{item.author}</span>
             </div>
             <div className="post-image">
-              <img src={item.filepath} alt="Post" />
+              {/*<img src={item.filepath} alt="Post" />*/}
+                 <Gallery>
+                   <Item
+                     original={`${dir}${item.filepath}`}
+                     thumbnail={`${dir}${item.filepath}`}
+                     width="1024"
+                     height="768"
+                   >
+                     {({ ref, open }) => (
+                       <img ref={ref} onClick={open} src={`${dir}${item.filepath}`} alt="Post" />
+                     )}
+                   </Item>
+              </Gallery>
             </div>
             <div className="post-actions">
               <button className="like-btn">❤️ Like</button>
