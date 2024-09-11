@@ -1,0 +1,86 @@
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
+
+.post {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+  width: 50%; /* 화면의 절반 크기로 설정 */
+  max-width: 600px; /* 최대 크기를 600px로 제한 */
+  margin: 0 auto; /* 중앙 정렬 */
+}
+
+.post:hover {
+  transform: translateY(-5px);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+}
+
+.profile-pic {
+  border-radius: 50%;
+  margin-right: 8px;
+  width: 30px;
+  height: 30px;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.post-image img {
+  width: 100%;
+  height: auto;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+}
+
+.like-btn, .comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.post-info {
+  padding: 8px;
+}
+
+.likes {
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.comments {
+  margin-top: 8px;
+}
+
+.comment {
+  margin-bottom: 4px;
+  font-size: 0.9em;
+}
+
+.comment-user {
+  font-weight: bold;
+}
+
+.timestamp {
+  display: block;
+  margin-top: 8px;
+  color: #888;
+  font-size: 0.8em;
+}

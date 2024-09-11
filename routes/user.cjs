@@ -7,7 +7,7 @@ router.get('/authCheck', (req, res) => {
   const sendData = { isLogin: '', userId: '' };
   if (req.session.isLogin) {
     sendData.isLogin = true;
-    sendData.userId = req.session.userId;
+    sendData.userId = req.session.userId; 
   } else {
     sendData.isLogin = false;
   }
@@ -30,9 +30,14 @@ router.post('/login', async (req, res) => {
   if (userId === '' || password === '') {
     res.status(401).json({ ok: false, error: "ID와 PW를 모두 입력해주세요." });
   } else {
-    const loadUser = `SELECT * FROM USER WHERE userId = '${userId}'`;
+    const loadUser = 'SELECT * FROM USER WHERE userId = ?';
     conn.query(loadUser, [userId], function (error, results, fields) {
-      if (results.length > 0) {
+      if (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ ok: false, error: "서버 오류 발생" });
+        return;
+      }
+      if (results && results.length > 0) {
         bcrypt.compare(password, results[0].password, (error, result) => {
           if (error) {
             console.error('bcrypt 비교 오류:', error);
@@ -67,12 +72,18 @@ router.post('/sign', async (req, res) => {
   const sendData = { isSuccess: '' };
   if (userId && password) {
     conn.query(`SELECT * FROM USER WHERE userId = ?`, [userId], function (err, results, fields) {
-      console.log('results : ', results)
-      if (results.length <= 0) {
+      if (err) {
+        console.error('Database query error:', err);
+        res.status(500).json({ ok: false, error: "서버 오류 발생" });
+        return;
+      }
+      if (results && results.length <= 0) {
         const hasedPw = bcrypt.hashSync(password, 10);
         conn.query(`INSERT INTO USER (userId, password) VALUES (?, ?)`, [userId, hasedPw], function (error, data) {
           if (error) {
-            console.log('error : ', error);
+            console.error('Database insert error:', error);
+            res.status(500).json({ ok: false, error: "서버 오류 발생" });
+            return;
           }
           req.session.save(function () {
             sendData.isSuccess = true;
@@ -84,6 +95,8 @@ router.post('/sign', async (req, res) => {
         res.send(sendData);
       }
     });
+  } else {
+    res.status(400).json({ ok: false, error: "ID와 PW를 모두 입력해주세요." });
   }
 });
 

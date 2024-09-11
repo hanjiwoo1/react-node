@@ -5,7 +5,7 @@ import Header from "./Header.tsx";
 function Layout() {
   const { user } = useAuth();
   return (
-    <div className="relative">
+    <div className="relative black">
       {user && <Header />}
       <Outlet />
     </div>

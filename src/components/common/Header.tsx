@@ -5,10 +5,11 @@ import {useNavigate} from "react-router-dom";
 const Header = () => {
   const navigate = useNavigate();
   return (
-    <Box bg="lightskyblue" p={4} color="white">
+    <Box p={4} color="white">
       <Flex alignItems="center">
         <Heading
           size="md"
+          color="black"
           onClick={() => {
             navigate('/')
           }}
