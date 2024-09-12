@@ -40,13 +40,13 @@ const Post = ({ resp }: ImagesProps) => {
               <Gallery>
                 <Item
                   // original={`${dir}${item.filepath}`}
-                  original={`${item.filepath}`}
-                  thumbnail={`${item.filepath}`}
+                  original={`/${item.filepath}`}
+                  thumbnail={`/${item.filepath}`}
                   width="1024"
                   height="768"
                 >
                   {({ ref, open }) => (
-                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`${item.filepath}`} alt="Post" />
+                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`/${item.filepath}`} alt="Post" />
                   )}
                 </Item>
               </Gallery>
