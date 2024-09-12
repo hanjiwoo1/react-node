@@ -8,8 +8,6 @@ interface ImagesProps {
 const Post = ({ resp }: ImagesProps) => {
   console.log('resp : ', resp);
 
-  const dir = import.meta.env.VITE_UPLOAD_DIR;
-
   const samplePost = {
     user: {
       username: 'john_doe',
@@ -41,13 +39,14 @@ const Post = ({ resp }: ImagesProps) => {
             <div className="post-image">
               <Gallery>
                 <Item
-                  original={`${dir}${item.filepath}`}
-                  thumbnail={`${dir}${item.filepath}`}
+                  // original={`${dir}${item.filepath}`}
+                  original={`${item.filepath}`}
+                  thumbnail={`${item.filepath}`}
                   width="1024"
                   height="768"
                 >
                   {({ ref, open }) => (
-                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`${dir}${item.filepath}`} alt="Post" />
+                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`${item.filepath}`} alt="Post" />
                   )}
                 </Item>
               </Gallery>
