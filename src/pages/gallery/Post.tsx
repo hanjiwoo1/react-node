@@ -6,8 +6,7 @@ interface ImagesProps {
 }
 
 const Post = ({ resp }: ImagesProps) => {
-  console.log('resp : ', resp);
-
+  console.log('resp : ', resp)
   const samplePost = {
     user: {
       username: 'john_doe',
@@ -38,17 +37,21 @@ const Post = ({ resp }: ImagesProps) => {
             </div>
             <div className="post-image">
               <Gallery>
-                <Item
-                  // original={`${dir}${item.filepath}`}
-                  original={`/${item.filepath}`}
-                  thumbnail={`/${item.filepath}`}
-                  width="1024"
-                  height="768"
-                >
-                  {({ ref, open }) => (
-                    <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`/${item.filepath}`} alt="Post" />
-                  )}
-                </Item>
+                {item.filepath.map((filepath: string, idx: number) =>{
+                  return (
+                    <Item
+                      key={idx}
+                      original={`/${filepath}`}
+                      thumbnail={`/${filepath}`}
+                      width="1024"
+                      height="768"
+                    >
+                      {({ ref, open }) => (
+                        <img ref={ref as unknown as React.RefObject<HTMLImageElement>} onClick={open} src={`/${filepath}`} alt="Post" />
+                      )}
+                    </Item>
+                  );
+                })}
               </Gallery>
             </div>
             <div className="post-actions">

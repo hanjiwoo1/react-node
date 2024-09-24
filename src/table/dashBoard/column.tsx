@@ -2,6 +2,8 @@ import {ColumnDef} from "@tanstack/react-table";
 import {Link} from "react-router-dom";
 
 export type posts = {
+  filepath: string;
+  fileId: number;
   id:string,
   title : string,
   content : string,

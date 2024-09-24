@@ -21,11 +21,11 @@ interface PhotoResult {
   filepath: string;
 }
 
-// Update the Photo interface to use the PhotoResult type
 export interface Photo {
   results: PhotoResult[];
 }
 
+// Update the Photo interface to use the PhotoResult type
 const PhotoGallery= () => {
   const baseUrl = import.meta.env.VITE_API_URL;
   const [file , setFile] = useState<Photo | null>(null);
@@ -46,19 +46,19 @@ const PhotoGallery= () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchApi(`${baseUrl}/api/posts`, {});
+        const response = await fetchApi<ResponseData>(`${baseUrl}/api/posts`, {});
         if ((response as ResponseData).ok) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          const updatedData = response.data.map((item) => {
-            file?.results.forEach(result =>{
-              if (item.fileId == result.id){
-                item.filepath = result.filepath
-              }
+          if (Array.isArray(response.data)) {
+            const updatedData = response.data.map((item) => {
+              file?.results.forEach(result =>{
+                if (item.fileId == result.id){
+                  item.filepath = result.filepath
+                }
+              })
+              return item;
             })
-            return item;
-          })
-          setResp(updatedData);
+            setResp({ ...response, data: updatedData });
+          }
         }
       } catch (e) {
         console.log('error : ', e)
@@ -68,10 +68,10 @@ const PhotoGallery= () => {
   }, [file]);
 
   return (
-    <Post
-      resp={resp}
-    />
-  );
+    <>
+      <Post resp={resp} />
+    </>
+);
 }
 
 export default PhotoGallery;

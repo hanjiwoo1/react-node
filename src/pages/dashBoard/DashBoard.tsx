@@ -13,12 +13,18 @@ function DashBoard() {
         >
           등록
         </Button>
-        <Button
+        {/*<Button*/}
+        {/*  colorScheme="blue"*/}
+        {/*  onClick={() => navigate("/dashBoard/gallery")}*/}
+        {/*>*/}
+        {/*  갤러리*/}
+        {/*</Button>*/}
+        {/*<Button
           colorScheme="blue"
-          onClick={() => navigate("/dashBoard/gallery")}
+          onClick={() => navigate("/dashBoard/photo")}
         >
           갤러리
-        </Button>
+        </Button>*/}
       </Box>
     </VStack>
   );
