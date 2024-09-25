@@ -1,9 +1,8 @@
 // src/table/dashBoard/BasicTable.tsx
 import {ColumnDef, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
 import {Table, Tbody, Td, Th, Thead, Tr} from "@chakra-ui/react";
-import './ImageGalleryStyles.css'
 
-interface ColumnMeta{
+interface ColumnMeta {
   isNumeric: boolean;
 }
 
@@ -13,9 +12,9 @@ interface BasicTableProps<TData, TValue> {
 }
 
 export function BasicTable<TData extends {fileId:number}, TValue>({
-  columns,
-  data,
-}: BasicTableProps<TData, TValue>) {
+                                                                    columns,
+                                                                    data,
+                                                                  }: BasicTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -23,18 +22,19 @@ export function BasicTable<TData extends {fileId:number}, TValue>({
   })
 
   return (
-    <Table className="custom-table">
-      <Thead>
+    <Table className="min-w-full divide-y divide-gray-200 shadow-lg rounded-lg">
+      <Thead className="bg-blue-50">
         {table.getHeaderGroups().map((headerGroup) => (
-          <Tr key={headerGroup.id} className="custom-header-row">
+          <Tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
               const meta: ColumnMeta = header.column.columnDef.meta as ColumnMeta;
               return (
                 <Th
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
-                  isNumeric={meta?.isNumeric}
-                  className="custom-header-cell"
+                  className={`px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase tracking-wider ${
+                    meta?.isNumeric ? "text-right" : "text-left"
+                  }`}
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -46,13 +46,21 @@ export function BasicTable<TData extends {fileId:number}, TValue>({
           </Tr>
         ))}
       </Thead>
-      <Tbody>
+      <Tbody className="bg-white divide-y divide-gray-200">
         {table.getRowModel().rows.map((row) => (
-          <Tr key={row.id} className="custom-row">
+          <Tr
+            key={row.id}
+            className="hover:bg-blue-50 transition duration-300 ease-in-out"
+          >
             {row.getVisibleCells().map((cell) => {
               const meta: ColumnMeta = cell.column.columnDef.meta as ColumnMeta;
               return (
-                <Td key={cell.id} isNumeric={meta?.isNumeric} className="custom-cell">
+                <Td
+                  key={cell.id}
+                  className={`px-6 py-4 whitespace-nowrap ${
+                    meta?.isNumeric ? "text-right" : "text-left"
+                  } text-sm text-gray-900`}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Td>
               );
