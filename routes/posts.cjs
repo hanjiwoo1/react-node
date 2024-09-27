@@ -18,31 +18,46 @@ router.get('/detail/:id', async(req, res) => {
   try{
     const { id } = req.params;
     const posts = await executeQuery(`SELECT * FROM posts WHERE id = ${id}`);
-    const files = await executeQuery(`SELECT * FROM files WHERE id = ${posts[0].fileId}`);
-    return res.json({ ok: true, data: {posts, files} });
+    const ids = await executeQuery(`SELECT * FROM post_files WHERE postId = ${id}`);
+    const fileIds = ids.map(file => file.fileId);
+    const files = await executeQuery(`SELECT * FROM files WHERE id IN (${fileIds})`);
+    return res.json({ ok: true, posts: posts[0], files: files});
   }catch(error){
     console.log(error)
   }
 })
 
+/**
+ * files table insert -> posts table insert-> fileId 받아온 후 post_files 테이블에 [postId, fileId] 형식으로 삽입
+ */
 router.post('/insert', async(req, res) => {
   try{
     const title = req.body.title
     const content = req.body.content
-    const insertId = req.body.insertId
+    const insertIds = Array.isArray(req.body.insertId)
+                                ? req.body.insertId
+                                : [req.body.insertId];
     const author = req.session.userId
-    const values = [title, content,author, insertId];
-    const insertSql = `INSERT INTO posts (title, content, author, fileId) VALUES (?,?,?,?)`
+    const values = [title, content, author];
 
+    const insertSql = `INSERT INTO posts (title, content, author) VALUES (?,?,?)` // posts table insert
     conn.query(insertSql, values, async (err, result) => {
       if (err) {
         console.error('게시판 글 등록 에러' + err.stack);
+        return res.json({ok: false});
       }
-      // console.log('게시판 등록 성공',);
-      const select = await executeQuery(`SELECT * FROM posts WHERE id = ${result.insertId}`)
-      return res.json({ok: true, result : select});
+
+      const postId = result.insertId; // posts table insert 후 id값
+      const fileValues = insertIds.map(id => [postId, id]) // [게시판id, 파일id] 형태로 배열 생성
+      const fileInsertSql = `INSERT INTO post_files (postId, fileId) VALUES ?` // post_files table insert
+      conn.query(fileInsertSql, [fileValues], (err, result) => {
+        if (err) {
+          console.error('파일정보등록 에러' + err.stack);
+          return
+        }
+      })
+      return res.json({ok: true});
     })
-    // return res.json({ ok: true, data: queryData });
   }catch(error){
     console.log(error)
   }

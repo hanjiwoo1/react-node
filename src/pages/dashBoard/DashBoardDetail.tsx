@@ -11,39 +11,26 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import {fetchApiGet} from "../../lib/fetchAPiGet.ts";
-import FileUpload, {ServerFile} from "../../components/FileUpload.tsx";
+import FileUpload from "../../components/FileUpload.tsx";
 import {uploadFile} from "../../lib/fileApi.ts";
 import {fetchApi} from "../../lib/fetchApi.ts";
-import {apiResponse} from "./DashBoardReg.tsx";
-
-interface Post{
-  title: string;
-  content: string;
-}
-
-interface ApiResponse{
-  data:{
-    posts: Post[];
-    files: File[];
-  }
-}
+import {Files, Post_Files} from "../../type/data.ts";
 
 function DashBoardDetail() {
   const { id } = useParams();
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
-  const [files, setFiles] = useState<(File | ServerFile)[]>([]);
+  const [files, setFiles] = useState<(File | Files)[]>([]);
   const toast = useToast();
   const baseUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetchApiGet<ApiResponse>(`${baseUrl}/api/posts/detail/${id}`);
-      // console.log('response : ', response)
-      setTitle(response.data.posts[0].title || '');
-      setContent(response.data.posts[0].content || '');
-      setFiles(response.data.files);
+      const response = await fetchApiGet<Post_Files>(`${baseUrl}/api/posts/detail/${id}`);
+      setTitle(response.posts.title || '');
+      setContent(response.posts.content || '');
+      setFiles(response.files);
     }
     fetchData().catch(console.error);
   }, []);
@@ -87,7 +74,7 @@ function DashBoardDetail() {
     id: string | undefined;
     insertId: number | null;
   }) => {
-    await fetchApi<apiResponse>(`${baseUrl}/api/posts/update`, data);
+    await fetchApi<Post_Files>(`${baseUrl}/api/posts/update`, data);
     navigate("/dashBoard", { replace: true });
   };
 

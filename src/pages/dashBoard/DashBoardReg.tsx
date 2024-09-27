@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { uploadFile } from "../../lib/fileApi.ts";
 import { fetchApi } from "../../lib/fetchApi.ts";
 import { useNavigate } from "react-router-dom";
-import FileUpload, {ServerFile} from "../../components/FileUpload.tsx";
+import FileUpload from "../../components/FileUpload.tsx";
 import {
   Box,
   Button,
@@ -13,24 +13,12 @@ import {
   FormLabel,
   useToast,
 } from "@chakra-ui/react";
-
+import {Files, Post} from "../../type/data.ts";
 const baseUrl = import.meta.env.VITE_API_URL;
-
-export interface apiResponse {
-  ok: boolean;
-  data: {
-    id: number;
-    title: string;
-    content: string;
-    fileId: number;
-  };
-  error?: string;
-}
-
 function DashBoardReg() {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
-  const [files, setFiles] = useState<(File | ServerFile)[]>([]);
+  const [files, setFiles] = useState<(File | Files)[]>([]);
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -69,7 +57,7 @@ function DashBoardReg() {
     content: string;
     insertId: number | null;
   }) => {
-    await fetchApi<apiResponse>(`${baseUrl}/api/posts/insert`, data);
+    await fetchApi<Post>(`${baseUrl}/api/posts/insert`, data);
     navigate("/dashBoard", { replace: true });
   };
 

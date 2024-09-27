@@ -1,23 +1,14 @@
 import React, {ChangeEvent, useEffect} from "react";
 import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
-
-export type ServerFile = {
-  id: number;
-  originalname: string;
-  filename: string;
-  mimetype: string;
-  size: number;
-  postId: number | null;
-  filepath: string;
-}
+import {Files} from "../type/data.ts";
 
 type FileUploadProps = {
-  onFilesSelected: (files: (File | ServerFile)[]) => void;
-  initialFiles?: (File | ServerFile)[];
+  onFilesSelected: (files: (File | Files)[]) => void;
+  initialFiles?: (File | Files)[];
 };
 
 export function FileUpload({ onFilesSelected, initialFiles = [] }: FileUploadProps) {
-  const [files, setFiles] = React.useState<(File | ServerFile)[]>([]);
+  const [files, setFiles] = React.useState<(File | Files)[]>([]);
 
   useEffect(() => {
     if (initialFiles.length > 0) {
