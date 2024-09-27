@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, {ChangeEvent, useEffect} from "react";
 import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
 
 export type ServerFile = {
@@ -13,11 +13,18 @@ export type ServerFile = {
 
 type FileUploadProps = {
   onFilesSelected: (files: (File | ServerFile)[]) => void;
+  initialFiles?: (File | ServerFile)[];
 };
 
-export function FileUpload({ onFilesSelected }: FileUploadProps) {
+export function FileUpload({ onFilesSelected, initialFiles = [] }: FileUploadProps) {
   const [files, setFiles] = React.useState<(File | ServerFile)[]>([]);
 
+  useEffect(() => {
+    if (initialFiles.length > 0) {
+      setFiles(initialFiles);
+    }
+  }, [initialFiles]);
+  
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const filesList = Array.from(e.target.files || []);
     setFiles(filesList);

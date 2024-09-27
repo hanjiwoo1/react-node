@@ -43,7 +43,7 @@ function DashBoardDetail() {
       // console.log('response : ', response)
       setTitle(response.data.posts[0].title || '');
       setContent(response.data.posts[0].content || '');
-      setFiles([response.data.files[0]]);
+      setFiles(response.data.files);
     }
     fetchData().catch(console.error);
   }, []);
@@ -125,8 +125,8 @@ function DashBoardDetail() {
             />
           </FormControl>
           <FileUpload
-            file={files}
-            setFile={setFiles}
+            onFilesSelected={setFiles}
+            initialFiles={files}
           />
           <Button
             type="submit"
