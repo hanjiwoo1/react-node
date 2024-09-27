@@ -107,8 +107,7 @@ function DashBoardReg() {
             />
           </FormControl>
           <FileUpload
-            file={files}
-            setFile={setFiles}
+            onFilesSelected={setFiles}
           />
           <Button
             type="submit"

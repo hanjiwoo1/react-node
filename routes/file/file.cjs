@@ -7,9 +7,18 @@ const path = require('path');
 const publicPath = path.join(__dirname, 'public');
 const uuid4 = require('uuid4');
 const fs = require('fs');
+const SFTPClient = require('ssh2-sftp-client');
 app.use(express.static(publicPath));
 
 require('dotenv').config();
+
+const sftp = new SFTPClient();
+const sftpConfig = {
+  host: process.env.VITE_DB_HOST,
+  port: 22,
+  username: process.env.VITE_DB_USER,
+  password: process.env.VITE_USER_PASS,
+};
 
 // multer 설정에 encoding 옵션 추가
 const storage = multer.diskStorage({
@@ -45,22 +54,38 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage, encoding: 'utf-8' });
 
-router.post('/upload', upload.array('files',5), (req, res) => {
+router.post('/upload', upload.array('files',5), async (req, res) => {
 
   const files = req.files;
-  const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
-  let values = [];
+  try {
 
-  files.forEach(file => {
-    const filePath = path.join('uploads', file.filename);
-    values.push([file.originalname, file.filename, filePath, file.mimetype, file.size]);
-  });
-  conn.query(insertSql, [values], (err, result) =>{
-    if (err) {
-      console.error('파일 저장 실패 :' + err.stack);
+    await sftp.connect(sftpConfig);
+    for (const file of files) {
+      const remoteFilePath = `${process.env.VITE_UPLOAD_DIR}/${file.filename}`; // 원격 서버의 경로로 변경
+      await sftp.put(file.path, remoteFilePath);
     }
-    return res.json({ ok: true, insertId: result.insertId ? result.insertId : '' });
-  })
+    await sftp.end();
+    res.json({ ok: true, message: 'Files uploaded successfully' });
+
+    // const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
+    // let values = [];
+    //
+    // files.forEach(file => {
+    //   const filePath = path.join('uploads', file.filename);
+    //   values.push([file.originalname, file.filename, filePath, file.mimetype, file.size]);
+    // });
+    // conn.query(insertSql, [values], (err, result) => {
+    //   if (err) {
+    //     console.error('파일 저장 실패 :' + err.stack);
+    //   }
+    //   return res.json({ok: true, insertId: result.insertId ? result.insertId : ''});
+    // })
+  } catch (err) {
+    console.error('SFTP upload error:', err);
+    res.status(500).json({ok: false, error: err.message});
+  }
+
+
 });
 
 router.post('/update', async(req, res) => {

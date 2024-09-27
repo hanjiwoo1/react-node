@@ -11,15 +11,17 @@ export type ServerFile = {
   filepath: string;
 }
 
-type FileProps = {
-  file: (File | ServerFile)[];
-  setFile: React.Dispatch<React.SetStateAction<(File | ServerFile)[]>>;
+type FileUploadProps = {
+  onFilesSelected: (files: (File | ServerFile)[]) => void;
 };
 
-export function FileUpload({ file, setFile }: FileProps) {
+export function FileUpload({ onFilesSelected }: FileUploadProps) {
+  const [files, setFiles] = React.useState<(File | ServerFile)[]>([]);
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const fileList = Array.from(e.target.files || []);
-    setFile(fileList);
+    const filesList = Array.from(e.target.files || []);
+    setFiles(filesList);
+    onFilesSelected(filesList);
   };
 
   return (
@@ -44,10 +46,10 @@ export function FileUpload({ file, setFile }: FileProps) {
         <Button as="label" htmlFor="file-upload" colorScheme="blue" size="md">
           파일 선택
         </Button>
-        {file.length && (
+        {files.length && (
           <Box>
             <Text>선택된 파일:</Text>
-            {file.map((f, index) => (
+            {files.map((f, index) => (
               <Text key={index}>
                 {"name" in f ? f.name : f.originalname}
               </Text>
