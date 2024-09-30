@@ -25,35 +25,62 @@ const upload = multer({ storage: storage });
 
 router.post('/upload', upload.array('files', 5), async (req, res) => {
   const files = req.files;
+  const uploadLocation = process.env.UPLOAD_LOCATION
   let insertId = [];
   try {
-    await sftp.connect(sftpConfig);
-    for (const file of files) {
-      const remoteDir = process.env.VITE_UPLOAD_DIR;
-      const remoteFilePath = `${remoteDir}/${file.originalname}`;
+    if (uploadLocation === 'local') {
+      await sftp.connect(sftpConfig);
+      for (const file of files) {
+        const remoteDir = process.env.VITE_UPLOAD_DIR;
+        const remoteFilePath = `${remoteDir}/${file.originalname}`;
 
-      // 원격 디렉토리 존재 여부 확인 및 생성
-      try {
-        await sftp.mkdir(remoteDir, true);
+        // 원격 디렉토리 존재 여부 확인 및 생성
+        try {
+          await sftp.mkdir(remoteDir, true);
+          const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
+          let values = [];
+          values.push([file.originalname, file.originalname, remoteFilePath, file.mimetype, file.size]);
+          conn.query(insertSql, [values], (err, result) => {
+            if (err) {
+              console.error('파일 저장 실패 :' + err.stack);
+            }
+            insertId.push(result.insertId);
+          });
+        } catch (err) {
+          if (err.code !== 4) {
+            throw err;
+          }
+        }
+
+        // 메모리에서 원격 서버로 파일 업로드
+        await sftp.put(Buffer.from(file.buffer), remoteFilePath);
+      }
+      await sftp.end();
+    }else {
+      for (const file of files) {
+        const localDir = process.env.VITE_UPLOAD_DIR;
+        const localFilePath = path.join(localDir, file.originalname);
+
+        // 로컬 디렉토리 존재 여부 확인 및 생성
+        if (!fs.existsSync(localDir)) {
+          fs.mkdirSync(localDir, { recursive: true });
+        }
+
+        // 파일을 로컬 디스크에 저장
+        fs.writeFileSync(localFilePath, file.buffer);
+
         const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
         let values = [];
-        values.push([file.originalname, file.originalname, remoteFilePath, file.mimetype, file.size]);
+        values.push([file.originalname, file.originalname, localFilePath, file.mimetype, file.size]);
         conn.query(insertSql, [values], (err, result) => {
           if (err) {
             console.error('파일 저장 실패 :' + err.stack);
           }
           insertId.push(result.insertId);
         });
-      } catch (err) {
-        if (err.code !== 4) {
-          throw err;
-        }
       }
-
-      // 메모리에서 원격 서버로 파일 업로드
-      await sftp.put(Buffer.from(file.buffer), remoteFilePath);
     }
-    await sftp.end();
+
     return res.json({ ok: true, insertId: insertId ? insertId : '' });
   } catch (err) {
     console.error('SFTP upload error:', err);
