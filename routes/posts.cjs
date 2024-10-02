@@ -37,6 +37,7 @@ router.post('/insert', async(req, res) => {
     const insertIds = Array.isArray(req.body.insertId)
                                 ? req.body.insertId
                                 : [req.body.insertId];
+    console.log('insertIds : ', insertIds)
     const author = req.session.userId
     const values = [title, content, author];
 
@@ -48,11 +49,13 @@ router.post('/insert', async(req, res) => {
       }
 
       const postId = result.insertId; // posts table insert 후 id값
+      console.log('postId : ', postId)
       const fileValues = insertIds.map(id => [postId, id]) // [게시판id, 파일id] 형태로 배열 생성
+      console.log('fileValues : ', fileValues)
       const fileInsertSql = `INSERT INTO post_files (postId, fileId) VALUES ?` // post_files table insert
       conn.query(fileInsertSql, [fileValues], (err, result) => {
         if (err) {
-          console.error('파일정보등록 에러' + err.stack);
+          console.error('포스트 파일 테이블 인서트 에러' + err.stack);
           return
         }
       })
