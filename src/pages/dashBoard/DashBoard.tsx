@@ -3,6 +3,7 @@ import {columns} from "../../table/dashBoard/column.tsx";
 import {useEffect, useState} from "react";
 import {fetchApi} from "../../lib/fetchApi.ts";
 import Nav from "../../components/common/Nav.tsx";
+import Photo from "../photo/Photo.tsx";
 
 interface ResponseData {
   id: string;
@@ -52,7 +53,7 @@ function DashBoard() {
 
           {/* 오른쪽의 작은 카드 영역 */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="bg-white p-4 shadow rounded">Card 1</div>
+            <div className="bg-white p-4 shadow rounded"><Photo/></div>
             <div className="bg-white p-4 shadow rounded">Card 2</div>
             <div className="bg-white p-4 shadow rounded">Card 3</div>
             <div className="bg-white p-4 shadow rounded">Card 4</div>

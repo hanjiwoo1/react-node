@@ -23,23 +23,58 @@ const sftpConfig = {
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+
+const getUniqueFileName = (dir, filename) => {
+  let ext = path.extname(filename);
+  let name = path.basename(filename, ext);
+  let counter = 1;
+  let newFilename = filename;
+
+  while (fs.existsSync(path.join(dir, newFilename))) {
+    newFilename = `${name}(${counter})${ext}`;
+    counter++;
+  }
+
+  return newFilename;
+};
+
+// 로컬 -> 원격서버
+const getUniqueRemoteFileName = async (sftp, dir, filename) => {
+  let ext = path.extname(filename);
+  let name = path.basename(filename, ext);
+  let counter = 1;
+  let newFilename = filename;
+
+  while (await sftp.exists(path.join(dir, newFilename))) {
+    newFilename = `${name}(${counter})${ext}`;
+    counter++;
+  }
+
+  return newFilename;
+};
+
 router.post('/upload', upload.array('files', 5), async (req, res) => {
   const files = req.files;
-  const uploadLocation = process.env.UPLOAD_LOCATION
+  const uploadLocation = process.env.UPLOAD_LOCATION;
   let insertId = [];
+
   try {
     if (uploadLocation === 'local') {
       await sftp.connect(sftpConfig);
       for (const file of files) {
         const remoteDir = process.env.VITE_UPLOAD_DIR;
-        const remoteFilePath = `${remoteDir}/${file.originalname}`;
+        let remoteFilePath = path.join(remoteDir, file.originalname);
+
+        // 중복 파일명 처리
+        const uniqueFilename = await getUniqueRemoteFileName(sftp, remoteDir, file.originalname);
+        remoteFilePath = path.join(remoteDir, uniqueFilename);
 
         // 원격 디렉토리 존재 여부 확인 및 생성
         try {
           await sftp.mkdir(remoteDir, true);
           const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
           let values = [];
-          values.push([file.originalname, file.originalname, remoteFilePath, file.mimetype, file.size]);
+          values.push([file.originalname, uniqueFilename, remoteFilePath, file.mimetype, file.size]);
           conn.query(insertSql, [values], (err, result) => {
             if (err) {
               console.error('파일 저장 실패 :' + err.stack);
@@ -56,10 +91,14 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
         await sftp.put(Buffer.from(file.buffer), remoteFilePath);
       }
       await sftp.end();
-    }else {
+    } else {
       for (const file of files) {
         const localDir = process.env.VITE_UPLOAD_DIR;
-        const localFilePath = path.join(localDir, file.originalname);
+        let localFilePath = path.join(localDir, file.originalname);
+
+        // 중복 파일명 처리
+        const uniqueFilename = getUniqueFileName(localDir, file.originalname);
+        localFilePath = path.join(localDir, uniqueFilename);
 
         // 로컬 디렉토리 존재 여부 확인 및 생성
         if (!fs.existsSync(localDir)) {
@@ -71,7 +110,7 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
 
         const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
         let values = [];
-        values.push([file.originalname, file.originalname, localFilePath, file.mimetype, file.size]);
+        values.push([file.originalname, uniqueFilename, localFilePath, file.mimetype, file.size]);
         conn.query(insertSql, [values], (err, result) => {
           if (err) {
             console.error('파일 저장 실패 :' + err.stack);
@@ -83,7 +122,7 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
 
     return res.json({ ok: true, insertId: insertId ? insertId : '' });
   } catch (err) {
-    console.error('SFTP upload error:', err);
+    console.error('파일 업로드 에러:', err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
