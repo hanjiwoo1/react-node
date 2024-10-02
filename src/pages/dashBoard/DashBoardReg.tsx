@@ -57,6 +57,7 @@ function DashBoardReg() {
     content: string;
     insertId: number | null;
   }) => {
+    console.log('insert data : ', data)
     await fetchApi<Post>(`${baseUrl}/api/posts/insert`, data);
     navigate("/dashBoard", { replace: true });
   };
