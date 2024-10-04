@@ -8,6 +8,8 @@ const Photo = () => {
     { src: 'https://picsum.photos/id/1019/1024/768', thumbnail: 'https://picsum.photos/id/1019/200/150', width: 1024, height: 768 },
   ];
 
+
+
   return (
     <Gallery>
       <Item

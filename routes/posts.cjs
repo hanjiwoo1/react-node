@@ -34,7 +34,6 @@ router.post('/insert', async(req, res) => {
   try{
     const title = req.body.title
     const content = req.body.content
-    console.log('req.body.insertId : ', req.body.insertId)
     const insertIds = Array.isArray(req.body.insertId)
                                 ? req.body.insertId
                                 : [req.body.insertId];

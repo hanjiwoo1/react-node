@@ -92,6 +92,7 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
       }
       await sftp.end();
     } else {
+      console.log('file else 분기 : ', )
       for (const file of files) {
         const localDir = process.env.VITE_UPLOAD_DIR;
         let localFilePath = path.join(localDir, file.originalname);
@@ -119,6 +120,8 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
         });
       }
     }
+
+    console.log('파일 인서트 insertId : ', insertId)
 
     return res.json({ ok: true, insertId: insertId ? insertId : '' });
   } catch (err) {
