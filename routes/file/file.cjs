@@ -61,25 +61,26 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
   try {
     if (uploadLocation === 'local') {
       await sftp.connect(sftpConfig);
-      for (const file of files) {
+      const promises = files.map(async (file) => {
         const remoteDir = process.env.VITE_UPLOAD_DIR;
         let remoteFilePath = path.join(remoteDir, file.originalname);
 
-        // 중복 파일명 처리
         const uniqueFilename = await getUniqueRemoteFileName(sftp, remoteDir, file.originalname);
         remoteFilePath = path.join(remoteDir, uniqueFilename);
 
-        // 원격 디렉토리 존재 여부 확인 및 생성
         try {
           await sftp.mkdir(remoteDir, true);
           const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
-          let values = [];
-          values.push([file.originalname, uniqueFilename, remoteFilePath, file.mimetype, file.size]);
-          conn.query(insertSql, [values], (err, result) => {
-            if (err) {
-              console.error('파일 저장 실패 :' + err.stack);
-            }
-            insertId.push(result.insertId);
+          let values = [[file.originalname, uniqueFilename, remoteFilePath, file.mimetype, file.size]];
+          return new Promise((resolve, reject) => {
+            conn.query(insertSql, [values], (err, result) => {
+              if (err) {
+                console.error('파일 저장 실패 :' + err.stack);
+                return reject(err);
+              }
+              insertId.push(result.insertId);
+              resolve();
+            });
           });
         } catch (err) {
           if (err.code !== 4) {
@@ -87,45 +88,41 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
           }
         }
 
-        // 메모리에서 원격 서버로 파일 업로드
         await sftp.put(Buffer.from(file.buffer), remoteFilePath);
-      }
+      });
+
+      await Promise.all(promises);
       await sftp.end();
     } else {
-      console.log('file else 분기 : ', )
-      for (const file of files) {
+      const promises = files.map((file) => {
         const localDir = process.env.VITE_UPLOAD_DIR;
         let localFilePath = path.join(localDir, file.originalname);
 
-        // 중복 파일명 처리
         const uniqueFilename = getUniqueFileName(localDir, file.originalname);
         localFilePath = path.join(localDir, uniqueFilename);
 
-        // 로컬 디렉토리 존재 여부 확인 및 생성
         if (!fs.existsSync(localDir)) {
           fs.mkdirSync(localDir, { recursive: true });
         }
 
-        // 파일을 로컬 디스크에 저장
         fs.writeFileSync(localFilePath, file.buffer);
 
-        console.log('file인서트 쿼리 실행 전 : ', )
         const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
-        let values = [];
-        values.push([file.originalname, uniqueFilename, localFilePath, file.mimetype, file.size]);
-        conn.query(insertSql, [values], (err, result) => {
-          console.log('쿼리 콜백함수 진입 : ', )
-          if (err) {
-            console.error('파일 저장 실패 :' + err.stack);
-          }
-
-          console.log('insert result@@   : ', result)
-          insertId.push(result.insertId);
+        let values = [[file.originalname, uniqueFilename, localFilePath, file.mimetype, file.size]];
+        return new Promise((resolve, reject) => {
+          conn.query(insertSql, [values], (err, result) => {
+            if (err) {
+              console.error('파일 저장 실패 :' + err.stack);
+              return reject(err);
+            }
+            insertId.push(result.insertId);
+            resolve();
+          });
         });
-      }
-    }
+      });
 
-    console.log('파일 인서트 insertId : ', insertId)
+      await Promise.all(promises);
+    }
 
     return res.json({ ok: true, insertId: insertId ? insertId : '' });
   } catch (err) {
