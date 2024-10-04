@@ -116,6 +116,8 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
           if (err) {
             console.error('파일 저장 실패 :' + err.stack);
           }
+
+          console.log('insert result@@   : ', result)
           insertId.push(result.insertId);
         });
       }
