@@ -109,10 +109,12 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
         // 파일을 로컬 디스크에 저장
         fs.writeFileSync(localFilePath, file.buffer);
 
+        console.log('file인서트 쿼리 실행 전 : ', )
         const insertSql = 'INSERT INTO files (originalname, filename, filepath, mimetype, size) VALUES ?';
         let values = [];
         values.push([file.originalname, uniqueFilename, localFilePath, file.mimetype, file.size]);
         conn.query(insertSql, [values], (err, result) => {
+          console.log('쿼리 콜백함수 진입 : ', )
           if (err) {
             console.error('파일 저장 실패 :' + err.stack);
           }
