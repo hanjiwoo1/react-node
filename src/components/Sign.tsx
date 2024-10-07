@@ -11,12 +11,7 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
-
-interface signData {
-  userId: string;
-  password: string;
-  isSuccess: boolean;
-}
+import {SignData} from "../type/data.ts";
 
 export function Sign() {
   const baseUrl = import.meta.env.VITE_API_URL;
@@ -45,7 +40,7 @@ export function Sign() {
       password: password,
     };
 
-    const response = await fetchApi<signData>(baseUrl + "/api/user/sign", data);
+    const response = await fetchApi<SignData>(baseUrl + "/api/user/sign", data);
     if (response.isSuccess) {
       toast({
         title: "회원가입 성공",

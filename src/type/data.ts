@@ -23,3 +23,15 @@ export interface Post_Files {
   posts: Post;
   files: Files[];
 }
+
+// 회원가입
+export interface SignData {
+  userId: string;
+  password: string;
+  isSuccess: boolean;
+}
+
+export interface ImgData {
+  ok: boolean;
+  results: Files[];
+}
