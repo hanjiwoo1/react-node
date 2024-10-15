@@ -3,16 +3,11 @@ import 'photoswipe/dist/photoswipe.css';
 import {fetchApi} from "../../lib/fetchApi.ts";
 import {Files} from "../../type/data.ts";
 import {useEffect, useState} from "react";
+import React from 'react';
 
 const Photo = () => {
-
-  const baseUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = import.meta.env.VITE_IMG_URL;
   const [photoData, setPhotoData] = useState<Files[]>();
-  // const images = [
-  //   { src: 'https://picsum.photos/id/1018/1024/768', thumbnail: 'https://picsum.photos/id/1018/200/150', width: 1024, height: 768 },
-  //   { src: 'https://picsum.photos/id/1015/1024/768', thumbnail: 'https://picsum.photos/id/1015/200/150', width: 1024, height: 768 },
-  //   { src: 'https://picsum.photos/id/1019/1024/768', thumbnail: 'https://picsum.photos/id/1019/200/150', width: 1024, height: 768 },
-  // ];
 
   useEffect(() => {
     const fetchData = async () =>{
@@ -25,29 +20,31 @@ const Photo = () => {
         console.log('PhotoData fetch error : ', err)
       }
     }
-      fetchData().catch(console.error);
-
-
+    fetchData().catch(console.error);
   }, []);
 
   return (
     <Gallery>
-      {photoData?.map((image, index) => (
+      {photoData?.map((photo, index) => (
         <Item
           key={index}
-          original={image.filepath}
-          thumbnail={image.filepath}
-          width={1024}
-          height={764}
+          original={`${baseUrl}/${photo.filepath}`} // 클릭 했을때 확대 되는 사진
+          thumbnail={`${baseUrl}/${photo.filepath}`} // 썸네일
+          width={607.5}
+          height={1080}
         >
           {({ ref, open }) => (
-            <img
-              ref={ref as unknown as React.RefObject<HTMLImageElement>}
-              onClick={open}
-              src={image.filepath}
-              alt="Thumbnail"
-              style={{ cursor: 'pointer' }}
-            />
+            index === 0 ? (
+              <img
+                ref={ref as unknown as React.RefObject<HTMLImageElement>}
+                onClick={open}
+                src={`${baseUrl}/${photo.filepath}`} // 첫 번째 이미지 데이터 사용
+                alt="Thumbnail"
+                className="w-1/6 h-auto"
+              />
+            ) : (
+              <span ref={ref as unknown as React.RefObject<HTMLSpanElement>} onClick={open} style={{ display: 'none' }} />
+            )
           )}
         </Item>
       ))}
